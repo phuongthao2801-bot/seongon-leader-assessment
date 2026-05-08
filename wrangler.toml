@@ -1,0 +1,18 @@
+name = "thaoseongon"
+compatibility_date = "2025-04-01"
+pages_build_output_dir = "."
+
+[[d1_databases]]
+binding = "BOOKING_DB"
+database_name = "abs-booking"
+database_id = "e7e9c597-850a-4916-9759-de577beece9e"
+
+[[d1_databases]]
+binding = "KH_DB"
+database_name = "abs-crm"
+database_id = "fb7b69b2-b529-463b-afba-fbf37f8c1c3a"
+
+[[d1_databases]]
+binding = "CHI_PHI_DB"
+database_name = "abs-duyet-chi"
+database_id = "c6ff508b-0fc1-4ded-b301-fe4955417c9e"

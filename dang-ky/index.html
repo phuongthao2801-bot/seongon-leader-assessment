@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng ký tư vấn miễn phí — SEONGON</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --blue: #004aef; --yellow: #ffce00; --cyan: #0dd1ff; --dark: #001a80; }
+
+    body { font-family: 'Inter', sans-serif; background: #f0f4ff; color: #1a1a2e; }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(135deg, var(--blue) 0%, var(--dark) 100%);
+      padding: 60px 24px 100px;
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .hero::before, .hero::after {
+      content: ''; position: absolute; border-radius: 50%; opacity: 0.08;
+    }
+    .hero::before { width: 500px; height: 500px; background: var(--cyan); top: -150px; right: -100px; animation: float 7s ease-in-out infinite; }
+    .hero::after  { width: 350px; height: 350px; background: var(--yellow); bottom: -100px; left: -80px; animation: float 9s ease-in-out infinite reverse; }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-24px)} }
+
+    .hero-badge {
+      display: inline-block;
+      background: var(--yellow); color: var(--dark);
+      font-weight: 700; font-size: 13px;
+      padding: 6px 18px; border-radius: 20px;
+      margin-bottom: 24px; position: relative; z-index: 1;
+      text-transform: uppercase; letter-spacing: 1px;
+    }
+    .hero h1 {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: clamp(28px, 5vw, 52px); font-weight: 800;
+      color: #fff; line-height: 1.15;
+      position: relative; z-index: 1; margin-bottom: 16px;
+    }
+    .hero h1 span { color: var(--yellow); }
+    .hero p {
+      color: rgba(255,255,255,0.85); font-size: 17px; line-height: 1.7;
+      max-width: 580px; margin: 0 auto 32px;
+      position: relative; z-index: 1;
+    }
+    .hero-stats {
+      display: flex; justify-content: center; gap: 40px; flex-wrap: wrap;
+      position: relative; z-index: 1;
+    }
+    .stat { text-align: center; }
+    .stat-num { font-family: 'Bricolage Grotesque', sans-serif; font-size: 32px; font-weight: 800; color: var(--yellow); }
+    .stat-label { font-size: 13px; color: rgba(255,255,255,0.7); margin-top: 4px; }
+
+    /* Services */
+    .services {
+      max-width: 1100px; margin: -50px auto 0;
+      padding: 0 16px; position: relative; z-index: 2;
+    }
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+    .service-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 20px rgba(0,74,239,0.1);
+      border-top: 4px solid var(--blue);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .service-card:hover { transform: translateY(-4px); box-shadow: 0 8px 30px rgba(0,74,239,0.15); }
+    .service-icon { font-size: 32px; margin-bottom: 12px; }
+    .service-name {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 17px; font-weight: 700; color: var(--dark); margin-bottom: 8px;
+    }
+    .service-desc { font-size: 14px; color: #555; line-height: 1.6; }
+    .service-tag {
+      display: inline-block; margin-top: 12px;
+      background: #f0f4ff; color: var(--blue);
+      font-size: 12px; font-weight: 600;
+      padding: 4px 10px; border-radius: 20px;
+    }
+
+    /* Why */
+    .why-section {
+      max-width: 900px; margin: 60px auto;
+      padding: 0 16px; text-align: center;
+    }
+    .section-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: clamp(22px, 4vw, 36px); font-weight: 700;
+      color: var(--dark); margin-bottom: 40px;
+    }
+    .why-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; }
+    .why-item { text-align: center; }
+    .why-icon { font-size: 36px; margin-bottom: 12px; }
+    .why-title { font-weight: 700; font-size: 15px; color: var(--dark); margin-bottom: 6px; }
+    .why-desc { font-size: 14px; color: #666; line-height: 1.6; }
+
+    /* Form section */
+    .form-section {
+      max-width: 580px; margin: 0 auto 60px;
+      padding: 0 16px;
+    }
+    .form-card {
+      background: #fff;
+      border-radius: 24px;
+      box-shadow: 0 8px 40px rgba(0,74,239,0.12);
+      overflow: hidden;
+    }
+    .form-header {
+      background: linear-gradient(135deg, var(--blue), var(--dark));
+      padding: 28px 32px;
+      text-align: center;
+    }
+    .form-header h2 {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 6px;
+    }
+    .form-header p { color: rgba(255,255,255,0.8); font-size: 14px; }
+    .form-header .badge {
+      display: inline-block;
+      background: var(--yellow); color: var(--dark);
+      font-size: 12px; font-weight: 700;
+      padding: 3px 12px; border-radius: 12px; margin-bottom: 12px;
+    }
+    .form-body { padding: 32px; }
+
+    .form-group { margin-bottom: 18px; }
+    label { display: block; font-size: 13px; font-weight: 600; color: #333; margin-bottom: 7px; }
+    label .req { color: #e53e3e; }
+    input, select {
+      width: 100%; padding: 13px 16px;
+      border: 2px solid #e8ecf4; border-radius: 10px;
+      font-size: 15px; font-family: 'Inter', sans-serif;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      color: #1a1a2e; background: #fff;
+    }
+    input:focus, select:focus {
+      outline: none; border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(0,74,239,0.1);
+    }
+
+    .submit-btn {
+      width: 100%; padding: 16px;
+      background: var(--blue); color: #fff;
+      border: none; border-radius: 12px;
+      font-size: 17px; font-weight: 700;
+      font-family: 'Bricolage Grotesque', sans-serif;
+      cursor: pointer; transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      margin-top: 8px;
+    }
+    .submit-btn:hover { background: var(--dark); transform: translateY(-1px); }
+    .submit-btn:disabled { background: #aaa; cursor: not-allowed; transform: none; }
+
+    .form-note {
+      text-align: center; font-size: 12px; color: #888;
+      margin-top: 14px; line-height: 1.6;
+    }
+
+    /* Success */
+    .success-view {
+      display: none; padding: 40px 32px; text-align: center;
+    }
+    .success-icon {
+      width: 80px; height: 80px; border-radius: 50%;
+      background: #e8f5e9; font-size: 40px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px;
+      animation: pop 0.4s ease;
+    }
+    @keyframes pop { 0%{transform:scale(0)} 70%{transform:scale(1.1)} 100%{transform:scale(1)} }
+    .success-view h3 {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 22px; color: var(--dark); margin-bottom: 10px;
+    }
+    .success-view p { color: #555; font-size: 15px; line-height: 1.7; }
+
+    /* Error */
+    .error-msg {
+      background: #fff0f0; border: 1px solid #fcc;
+      border-radius: 8px; padding: 12px 16px;
+      color: #c53030; font-size: 14px;
+      margin-top: 14px; display: none;
+    }
+
+    /* Clients */
+    .clients-section {
+      background: #fff; padding: 40px 24px; text-align: center;
+      border-top: 1px solid #eef;
+    }
+    .clients-title { font-size: 13px; color: #999; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; }
+    .clients-logos { display: flex; justify-content: center; gap: 32px; flex-wrap: wrap; align-items: center; }
+    .client-logo {
+      background: #f0f4ff; border-radius: 8px;
+      padding: 10px 20px; font-size: 13px;
+      font-weight: 700; color: var(--blue);
+    }
+
+    .footer {
+      text-align: center; padding: 32px 16px;
+      font-size: 13px; color: #999;
+      border-top: 1px solid #eef;
+    }
+    .footer a { color: var(--blue); text-decoration: none; }
+
+    .spinner {
+      width: 20px; height: 20px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-badge">🚀 Tư vấn miễn phí — Không ràng buộc</div>
+  <h1>Tăng trưởng doanh thu<br>với <span>Digital Marketing</span><br>chuẩn AI thế hệ mới</h1>
+  <p>SEONGON giúp doanh nghiệp vừa và lớn dominate Google Search, AI Overview, Google Maps — tăng khách hàng tiềm năng chất lượng cao mà không tốn ngân sách lãng phí.</p>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-num">14+</div><div class="stat-label">Năm kinh nghiệm</div></div>
+    <div class="stat"><div class="stat-num">200+</div><div class="stat-label">Khách hàng doanh nghiệp</div></div>
+    <div class="stat"><div class="stat-num">3x</div><div class="stat-label">Tăng trưởng doanh thu</div></div>
+  </div>
+</div>
+
+<!-- Services -->
+<div class="services">
+  <div class="services-grid">
+    <div class="service-card">
+      <div class="service-icon">🤖</div>
+      <div class="service-name">SEO AI Max</div>
+      <div class="service-desc">SEO tổng thể tích hợp AI Overview — xuất hiện trên kết quả AI của Google, thống trị tìm kiếm thế hệ mới.</div>
+      <span class="service-tag">Organic Growth</span>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">🌐</div>
+      <div class="service-name">GEO</div>
+      <div class="service-desc">Tối ưu AI Search — đảm bảo thương hiệu xuất hiện khi khách hàng hỏi ChatGPT, Gemini, Perplexity.</div>
+      <span class="service-tag">AI Search</span>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">📊</div>
+      <div class="service-name">Google Ads</div>
+      <div class="service-desc">Quản lý quảng cáo Google tối ưu ROAS — chi đúng chỗ, đúng người, đúng thời điểm. Không lãng phí ngân sách.</div>
+      <span class="service-tag">Performance</span>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">📍</div>
+      <div class="service-name">Total Business Maps</div>
+      <div class="service-desc">Xác minh & tối ưu chuỗi Google Maps cho doanh nghiệp nhiều điểm bán — tăng lượt ghé thăm offline.</div>
+      <span class="service-tag">Local SEO</span>
+    </div>
+  </div>
+</div>
+
+<!-- Why SEONGON -->
+<div class="why-section">
+  <h2 class="section-title">Tại sao chọn SEONGON?</h2>
+  <div class="why-grid">
+    <div class="why-item">
+      <div class="why-icon">🎯</div>
+      <div class="why-title">Chuyên biệt B2B</div>
+      <div class="why-desc">Hiểu sâu hành trình mua của doanh nghiệp, không làm đại trà</div>
+    </div>
+    <div class="why-item">
+      <div class="why-icon">🤝</div>
+      <div class="why-title">Cam kết kết quả</div>
+      <div class="why-desc">KPI rõ ràng từ ngày đầu — traffic, leads, doanh thu</div>
+    </div>
+    <div class="why-item">
+      <div class="why-icon">⚡</div>
+      <div class="why-title">Đội ngũ chất lượng</div>
+      <div class="why-desc">Nhân sự được tuyển chọn kỹ, văn hóa làm việc chuyên nghiệp</div>
+    </div>
+    <div class="why-item">
+      <div class="why-icon">🔬</div>
+      <div class="why-title">AI-First Approach</div>
+      <div class="why-desc">Tích hợp AI vào mọi quy trình — nhanh hơn, hiệu quả hơn</div>
+    </div>
+  </div>
+</div>
+
+<!-- Registration Form -->
+<div class="form-section" id="dang-ky">
+  <div class="form-card">
+    <!-- Form view -->
+    <div id="form-view">
+      <div class="form-header">
+        <div class="badge">✨ Hoàn toàn miễn phí</div>
+        <h2>Đăng ký tư vấn miễn phí</h2>
+        <p>Chuyên gia SEONGON sẽ liên hệ trong vòng 24 giờ</p>
+      </div>
+      <div class="form-body">
+        <form id="reg-form" action="/api/register" method="POST">
+          <div class="form-group">
+            <label>Họ và tên <span class="req">*</span></label>
+            <input type="text" name="ho_ten" id="ho_ten" placeholder="Nguyễn Văn A" required maxlength="100">
+          </div>
+          <div class="form-group">
+            <label>Email công ty <span class="req">*</span></label>
+            <input type="email" name="email" id="email" placeholder="ten@congty.com" required maxlength="200">
+          </div>
+          <div class="form-group">
+            <label>Số điện thoại <span class="req">*</span></label>
+            <input type="tel" name="dien_thoai" id="dien_thoai" placeholder="0901 234 567" required maxlength="20">
+          </div>
+          <div class="form-group">
+            <label>Dịch vụ quan tâm</label>
+            <select name="dich_vu" id="dich_vu">
+              <option value="">-- Chọn dịch vụ (không bắt buộc) --</option>
+              <option value="SEO AI Max">SEO AI Max — SEO tổng thể tích hợp AI Overview</option>
+              <option value="GEO">GEO — Tối ưu AI Search</option>
+              <option value="Google Ads">Google Ads — Quảng cáo Google</option>
+              <option value="Total Business Maps">Total Business Maps — Chuỗi Maps</option>
+            </select>
+          </div>
+
+          <div class="error-msg" id="error-msg"></div>
+
+          <button type="submit" class="submit-btn" id="submit-btn">
+            <span id="btn-text">Đăng ký tư vấn miễn phí</span>
+          </button>
+          <p class="form-note">🔒 Thông tin của bạn được bảo mật tuyệt đối.<br>SEONGON cam kết không spam.</p>
+        </form>
+      </div>
+    </div>
+
+    <!-- Success view -->
+    <div class="success-view" id="success-view">
+      <div class="success-icon">✅</div>
+      <h3>Đăng ký thành công!</h3>
+      <p>Cảm ơn bạn đã tin tưởng SEONGON.<br>
+      Chuyên gia của chúng tôi sẽ liên hệ với bạn<br>
+      trong vòng <strong>24 giờ làm việc</strong>.<br><br>
+      📧 Email xác nhận đã được gửi đến hộp thư của bạn.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Clients -->
+<div class="clients-section">
+  <div class="clients-title">Khách hàng đã tin tưởng SEONGON</div>
+  <div class="clients-logos">
+    <div class="client-logo">Vingroup</div>
+    <div class="client-logo">FPT</div>
+    <div class="client-logo">Masan</div>
+    <div class="client-logo">Techcombank</div>
+    <div class="client-logo">Viettel</div>
+  </div>
+</div>
+
+<div class="footer">
+  <a href="https://seongon.com">SEONGON</a> · Digital Marketing Agency ·
+  <a href="https://thaoseongon.com">thaoseongon.com</a>
+</div>
+
+<script>
+// Show success if redirected back with ?success=1
+if (new URLSearchParams(location.search).get('success') === '1') {
+  document.getElementById('form-view').style.display = 'none';
+  document.getElementById('success-view').style.display = 'block';
+}
+
+document.getElementById('reg-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const errEl = document.getElementById('error-msg');
+  errEl.style.display = 'none';
+
+  const ho_ten   = document.getElementById('ho_ten').value.trim();
+  const email    = document.getElementById('email').value.trim();
+  const dien_thoai = document.getElementById('dien_thoai').value.trim();
+  const dich_vu  = document.getElementById('dich_vu').value;
+
+  if (!ho_ten || !email || !dien_thoai) {
+    errEl.textContent = 'Vui lòng điền đầy đủ thông tin bắt buộc';
+    errEl.style.display = 'block'; return;
+  }
+
+  const btn = document.getElementById('submit-btn');
+  const btnText = document.getElementById('btn-text');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div><span>Đang gửi...</span>';
+
+  try {
+    const res = await fetch('/api/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ho_ten, email, dien_thoai, dich_vu })
+    });
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      document.getElementById('form-view').style.display = 'none';
+      document.getElementById('success-view').style.display = 'block';
+    } else {
+      errEl.textContent = data.error || 'Có lỗi xảy ra, vui lòng thử lại';
+      errEl.style.display = 'block';
+      btn.disabled = false;
+      btn.innerHTML = '<span>Đăng ký tư vấn miễn phí</span>';
+    }
+  } catch {
+    errEl.textContent = 'Lỗi kết nối, vui lòng thử lại';
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.innerHTML = '<span>Đăng ký tư vấn miễn phí</span>';
+  }
+});
+</script>
+</body>
+</html>

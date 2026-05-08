@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data:; script-src 'none';">
+<title>Ngô Phương Thảo (Bơ) — CCO SEONGON</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --brand: #004aef;
+    --brand-dark: #0033cc;
+    --cyan: #0dd1ff;
+    --yellow: #ffce00;
+    --orange: #FF6A1A;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Inter', sans-serif; background: #fff; color: #111; overflow-x: hidden; }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #004aef 0%, #0033cc 40%, #001a80 70%, #000d40 100%);
+    position: relative;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 70% 50%, rgba(13,209,255,0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 20% 80%, rgba(255,206,0,0.1) 0%, transparent 50%);
+  }
+  /* floating blobs */
+  .blob {
+    position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.25; animation: float 8s ease-in-out infinite;
+  }
+  .blob1 { width: 400px; height: 400px; background: var(--cyan); top: -100px; right: -50px; animation-delay: 0s; }
+  .blob2 { width: 300px; height: 300px; background: var(--yellow); bottom: -80px; left: 10%; animation-delay: 3s; }
+  .blob3 { width: 200px; height: 200px; background: var(--orange); top: 30%; left: 60%; animation-delay: 5s; }
+  @keyframes float {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-30px) scale(1.05); }
+  }
+
+  .hero-inner {
+    max-width: 1100px; margin: 0 auto; padding: 80px 40px;
+    display: grid; grid-template-columns: 1fr 420px; gap: 60px; align-items: center;
+    position: relative; z-index: 1;
+  }
+
+  /* avatar */
+  .avatar-wrap {
+    position: relative; width: 420px; height: 500px; flex-shrink: 0;
+  }
+  .avatar-ring {
+    position: absolute; inset: -8px;
+    border-radius: 30px;
+    background: linear-gradient(135deg, var(--cyan), var(--yellow), var(--orange));
+    animation: spin-ring 6s linear infinite;
+  }
+  @keyframes spin-ring {
+    0% { filter: hue-rotate(0deg); }
+    100% { filter: hue-rotate(360deg); }
+  }
+  .avatar-img {
+    position: relative; width: 100%; height: 100%;
+    border-radius: 24px; overflow: hidden; z-index: 1;
+  }
+  .avatar-img img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+
+  /* badge */
+  .badge-float {
+    position: absolute; bottom: -20px; left: -20px; z-index: 2;
+    background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
+    border-radius: 16px; padding: 14px 20px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    animation: bounce-in 1s ease 0.5s both;
+  }
+  @keyframes bounce-in {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  .badge-float .num { font-family: 'Bricolage Grotesque', sans-serif; font-size: 28px; font-weight: 800; color: var(--brand); }
+  .badge-float .label { font-size: 11px; color: #666; }
+
+  /* hero text */
+  .hero-text { color: white; }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 30px; padding: 6px 16px;
+    font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+    margin-bottom: 20px; animation: fade-up 0.6s ease both;
+  }
+  .hero-eyebrow span { width: 6px; height: 6px; background: var(--yellow); border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.5)} }
+
+  .hero-name {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: clamp(36px, 5vw, 60px); font-weight: 800; line-height: 1.1;
+    margin-bottom: 8px; animation: fade-up 0.6s ease 0.1s both;
+  }
+  .hero-name em { font-style: normal; color: var(--yellow); }
+
+  .hero-title {
+    font-size: 16px; font-weight: 500; opacity: 0.8; margin-bottom: 24px;
+    animation: fade-up 0.6s ease 0.2s both;
+  }
+  .hero-title strong { color: var(--cyan); font-weight: 700; }
+
+  .hero-tagline {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: clamp(15px, 2vw, 18px); font-weight: 700;
+    line-height: 1.5; opacity: 0.95; margin-bottom: 32px;
+    padding-left: 16px; border-left: 3px solid var(--yellow);
+    animation: fade-up 0.6s ease 0.3s both;
+  }
+
+  .hero-bio {
+    font-size: 14px; line-height: 1.7; opacity: 0.8; margin-bottom: 36px;
+    animation: fade-up 0.6s ease 0.4s both;
+  }
+
+  .hero-cta {
+    display: flex; gap: 14px; flex-wrap: wrap;
+    animation: fade-up 0.6s ease 0.5s both;
+  }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--yellow); color: #000; font-weight: 800; font-size: 14px;
+    padding: 14px 28px; border-radius: 50px; text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,206,0,0.4); }
+  .btn-secondary {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3);
+    color: white; font-weight: 600; font-size: 14px;
+    padding: 14px 28px; border-radius: 50px; text-decoration: none;
+    transition: background 0.2s;
+  }
+  .btn-secondary:hover { background: rgba(255,255,255,0.2); }
+
+  @keyframes fade-up {
+    0% { opacity: 0; transform: translateY(24px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── MARQUEE ── */
+  .marquee-wrap {
+    background: var(--yellow); padding: 14px 0; overflow: hidden;
+  }
+  .marquee-track {
+    display: flex; gap: 0; animation: marquee 18s linear infinite; width: max-content;
+  }
+  .marquee-track span {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 15px; font-weight: 800; color: #000;
+    white-space: nowrap; padding: 0 24px;
+  }
+  .marquee-dot { color: var(--brand); margin: 0 4px; }
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* ── STATS ── */
+  .stats-section {
+    background: linear-gradient(135deg, #004aef, #0033cc);
+    padding: 60px 40px;
+  }
+  .stats-inner { max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+  .stat-card {
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 20px; padding: 32px 28px; text-align: center;
+    transition: transform 0.3s, background 0.3s;
+  }
+  .stat-card:hover { transform: translateY(-4px); background: rgba(255,255,255,0.15); }
+  .stat-icon { font-size: 36px; margin-bottom: 12px; }
+  .stat-num {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 38px; font-weight: 800; color: var(--yellow); margin-bottom: 8px;
+  }
+  .stat-label { font-size: 13px; color: rgba(255,255,255,0.75); line-height: 1.4; }
+
+  /* ── ABOUT ── */
+  .about-section { padding: 80px 40px; background: #fafafa; }
+  .about-inner { max-width: 900px; margin: 0 auto; }
+  .section-label {
+    display: inline-block; font-size: 11px; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 2px; color: var(--brand); margin-bottom: 12px;
+  }
+  .section-title {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: clamp(28px, 4vw, 42px); font-weight: 800; line-height: 1.2;
+    margin-bottom: 28px; color: #111;
+  }
+  .section-title em { font-style: normal; color: var(--brand); }
+  .about-text { font-size: 16px; line-height: 1.85; color: #444; }
+
+  /* ── EXPERTISE ── */
+  .expertise-section { padding: 80px 40px; background: #fff; }
+  .expertise-inner { max-width: 900px; margin: 0 auto; }
+  .expertise-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 40px; }
+  .expertise-card {
+    background: linear-gradient(135deg, #f0f5ff, #e8f0ff);
+    border-radius: 20px; padding: 32px 28px;
+    border-top: 4px solid var(--brand);
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .expertise-card:hover { transform: translateY(-6px); box-shadow: 0 16px 48px rgba(0,74,239,0.15); }
+  .expertise-card:nth-child(2) { border-top-color: var(--cyan); background: linear-gradient(135deg, #f0fbff, #e0f8ff); }
+  .expertise-card:nth-child(3) { border-top-color: var(--orange); background: linear-gradient(135deg, #fff5f0, #ffe8e0); }
+  .exp-icon { font-size: 36px; margin-bottom: 16px; }
+  .exp-title { font-family: 'Bricolage Grotesque', sans-serif; font-size: 18px; font-weight: 800; margin-bottom: 10px; color: #111; }
+  .exp-desc { font-size: 13px; color: #666; line-height: 1.6; }
+
+  /* ── CTA SECTION ── */
+  .cta-section {
+    padding: 80px 40px;
+    background: linear-gradient(135deg, #001a80, #004aef);
+    text-align: center; color: white;
+  }
+  .cta-inner { max-width: 700px; margin: 0 auto; }
+  .cta-section .section-title { color: white; margin-bottom: 16px; }
+  .cta-section .section-title em { color: var(--yellow); }
+  .cta-section p { font-size: 16px; opacity: 0.8; margin-bottom: 36px; }
+  .cta-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: #000; color: rgba(255,255,255,0.5);
+    padding: 32px 40px; text-align: center; font-size: 12px;
+  }
+  footer a { color: var(--cyan); text-decoration: none; }
+  footer .abs-badge { margin-top: 8px; font-size: 11px; opacity: 0.4; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .hero-inner { grid-template-columns: 1fr; padding: 60px 24px; }
+    .hero-inner { display: flex; flex-direction: column-reverse; }
+    .avatar-wrap { width: 100%; max-width: 320px; height: 380px; margin: 0 auto; }
+    .stats-inner, .expertise-grid { grid-template-columns: 1fr; }
+    .hero-cta { flex-direction: column; }
+    .btn-primary, .btn-secondary { text-align: center; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="blob blob1"></div>
+  <div class="blob blob2"></div>
+  <div class="blob blob3"></div>
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow"><span></span> CCO · SEONGON · AI Search Marketing</div>
+      <h1 class="hero-name">Ngô Phương Thảo <em>(Bơ)</em></h1>
+      <p class="hero-title">CCO - Giám đốc Khách hàng · <strong>SEONGON</strong></p>
+      <blockquote class="hero-tagline">&ldquo;Chúng tôi tin rằng chỉ khi Khách hàng thành công thì SEONGON mới thành công!&rdquo;</blockquote>
+      <p class="hero-bio">Tôi là Ngô Phương Thảo - CCO tại SEONGON - AI Search Marketing Growth Partner hàng đầu Việt Nam. Với hơn 14 năm kinh nghiệm với Digital Marketing, tôi đã đồng hành cùng hàng trăm doanh nghiệp vừa và lớn tăng trưởng bền vững qua các giải pháp SEO và Digital Marketing toàn diện.</p>
+      <div class="hero-cta">
+        <a href="#dat-lich" class="btn-primary">📅 Đặt lịch gặp tôi</a>
+        <a href="mailto:ngophuongthao@seongon.com" class="btn-secondary">✉️ Gửi email</a>
+        <a href="https://seongon.com" target="_blank" rel="noopener noreferrer" class="btn-secondary">🌐 SEONGON</a>
+      </div>
+    </div>
+    <div class="avatar-wrap">
+      <div class="avatar-ring"></div>
+      <div class="avatar-img">
+        <img src="images/avatar.jpg" alt="Ngô Phương Thảo - CCO SEONGON" loading="eager">
+      </div>
+      <div class="badge-float">
+        <div class="num">14+</div>
+        <div class="label">Năm kinh nghiệm</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap" aria-hidden="true">
+  <div class="marquee-track">
+    <span>Người truyền cảm hứng</span><span class="marquee-dot">·</span>
+    <span>Digital Marketing</span><span class="marquee-dot">·</span>
+    <span>AI Search</span><span class="marquee-dot">·</span>
+    <span>14 Năm Kinh Nghiệm</span><span class="marquee-dot">·</span>
+    <span>Growth Partner</span><span class="marquee-dot">·</span>
+    <span>SEONGON</span><span class="marquee-dot">·</span>
+    <span>Người truyền cảm hứng</span><span class="marquee-dot">·</span>
+    <span>Digital Marketing</span><span class="marquee-dot">·</span>
+    <span>AI Search</span><span class="marquee-dot">·</span>
+    <span>14 Năm Kinh Nghiệm</span><span class="marquee-dot">·</span>
+    <span>Growth Partner</span><span class="marquee-dot">·</span>
+    <span>SEONGON</span><span class="marquee-dot">·</span>
+  </div>
+</div>
+
+<!-- STATS -->
+<section class="stats-section">
+  <div class="stats-inner">
+    <div class="stat-card">
+      <div class="stat-icon">🏆</div>
+      <div class="stat-num">14+</div>
+      <div class="stat-label">Năm kinh nghiệm<br>Digital Marketing</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🤝</div>
+      <div class="stat-num">20+</div>
+      <div class="stat-label">Doanh nghiệp lớn nhỏ<br>được đồng hành</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🚀</div>
+      <div class="stat-num">x3</div>
+      <div class="stat-label">Doanh thu khách hàng tăng trưởng<br>trong 1 năm qua Google Ads &amp; AI</div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about-section">
+  <div class="about-inner">
+    <span class="section-label">Về tôi</span>
+    <h2 class="section-title">Hành trình <em>14 năm</em> đồng hành<br>cùng doanh nghiệp Việt</h2>
+    <p class="about-text">14 năm trong ngành Digital Marketing đã cho tôi cơ hội được đồng hành cùng hơn 20 doanh nghiệp lớn nhỏ như Sun World, Richy, Sim Thăng Long... trong hành trình xây dựng thương hiệu số bền vững. Trước khi gắn bó với SEONGON, tôi đã tích lũy kinh nghiệm thực chiến tại BioSpring và Mazda Việt Nam, nơi tôi hiểu rằng Marketing hiệu quả phải đo được bằng kết quả kinh doanh thực tế. Tôi cũng là giảng viên Google Marketing tại SEONGON và Học viện IM Group, vì tôi tin rằng chia sẻ kiến thức là cách nhanh nhất để nâng tầm cả ngành. Là diễn giả tại Diễn đàn CSMO - VSMCamp và giám khảo Marketing Hive, Marketing On Air NEU nhiều năm liên tiếp, tôi luôn tìm cách kết nối thế hệ làm marketing kế tiếp với những bài học thực tiễn nhất. Với tôi, mỗi chiến dịch không chỉ là con số, đó là câu chuyện tăng trưởng của một doanh nghiệp, một con người.</p>
+  </div>
+</section>
+
+<!-- EXPERTISE -->
+<section class="expertise-section">
+  <div class="expertise-inner">
+    <span class="section-label">Chuyên môn</span>
+    <h2 class="section-title">3 lĩnh vực tôi<br><em>đi sâu nhất</em></h2>
+    <div class="expertise-grid">
+      <div class="expertise-card">
+        <div class="exp-icon">🔍</div>
+        <div class="exp-title">SEO &amp; AI Search Marketing</div>
+        <div class="exp-desc">Chiến lược tối ưu tìm kiếm toàn diện — từ SEO truyền thống đến AI Search Generation, giúp doanh nghiệp dẫn đầu trong kỷ nguyên AI.</div>
+      </div>
+      <div class="expertise-card">
+        <div class="exp-icon">🎯</div>
+        <div class="exp-title">Digital Branding</div>
+        <div class="exp-desc">Xây dựng thương hiệu số bền vững — định vị thương hiệu rõ ràng, nhất quán trên mọi kênh digital.</div>
+      </div>
+      <div class="expertise-card">
+        <div class="exp-icon">📈</div>
+        <div class="exp-title">Google Ads &amp; Performance Marketing</div>
+        <div class="exp-desc">Tối ưu hiệu suất quảng cáo Google, ứng dụng AI vào vận hành — đo được bằng kết quả kinh doanh thực tế.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="dat-lich">
+  <div class="cta-inner">
+    <span class="section-label" style="color:var(--yellow)">Kết nối</span>
+    <h2 class="section-title">Sẵn sàng <em>tăng trưởng</em><br>cùng nhau?</h2>
+    <p>Đặt lịch 30 phút để trao đổi về chiến lược Digital Marketing cho doanh nghiệp của bạn.</p>
+    <div class="cta-buttons">
+      <a href="mailto:ngophuongthao@seongon.com" class="btn-primary">✉️ ngophuongthao@seongon.com</a>
+      <a href="https://seongon.com" target="_blank" rel="noopener noreferrer" class="btn-secondary">🌐 seongon.com</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div>© 2026 Ngô Phương Thảo · <a href="https://seongon.com">SEONGON</a> · AI Search Marketing Growth Partner</div>
+  <div class="abs-badge">Tạo trong khóa <a href="https://agentboss.vn/starter" target="_blank" rel="noopener noreferrer">Agent Boss Starter — agentboss.vn/starter</a></div>
+</footer>
+
+</body>
+</html>

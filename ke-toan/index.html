@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kế toán — Duyệt chi SEONGON</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f4ff;min-height:100vh}
+  /* Login */
+  #login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+  .login-card{background:#fff;border-radius:16px;padding:40px;max-width:380px;width:100%;box-shadow:0 4px 24px rgba(0,74,239,.12)}
+  .login-card h1{font-size:20px;color:#111;margin-bottom:6px}
+  .login-card p{color:#666;font-size:14px;margin-bottom:24px}
+  .login-card input{width:100%;padding:11px 14px;border:1.5px solid #dde3f5;border-radius:8px;font-size:15px;margin-bottom:14px;outline:none}
+  .login-card input:focus{border-color:#004aef}
+  .login-card button{width:100%;padding:13px;background:#004aef;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer}
+  .login-card button:hover{background:#0036c0}
+  .login-err{color:#c0392b;font-size:13px;margin-top:8px;display:none}
+  /* Dashboard */
+  #dashboard{display:none}
+  .topbar{background:#004aef;padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
+  .topbar .title{color:#fff;font-weight:700;font-size:17px}
+  .topbar .logout{color:#ffce00;font-size:13px;cursor:pointer;text-decoration:underline}
+  .main{padding:24px;max-width:1100px;margin:0 auto}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:24px}
+  .stat-card{background:#fff;border-radius:12px;padding:18px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+  .stat-card .num{font-size:28px;font-weight:800;color:#004aef}
+  .stat-card.approved .num{color:#22aa55}
+  .stat-card.rejected .num{color:#c0392b}
+  .stat-card .label{font-size:12px;color:#666;margin-top:4px}
+  .toolbar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+  .toolbar select,.toolbar input{padding:9px 13px;border:1.5px solid #dde3f5;border-radius:8px;font-size:14px;outline:none;background:#fff}
+  .toolbar input{flex:1;min-width:180px}
+  .toolbar button{padding:9px 16px;background:#004aef;color:#fff;border:none;border-radius:8px;font-size:14px;cursor:pointer;font-weight:600}
+  .toolbar button.export{background:#22aa55}
+  table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+  th{background:#f0f4ff;color:#004aef;font-size:12px;font-weight:700;padding:11px 12px;text-align:left;text-transform:uppercase;letter-spacing:.5px}
+  td{padding:11px 12px;border-top:1px solid #f0f0f0;font-size:14px;color:#222;vertical-align:top}
+  tr:hover td{background:#fafbff}
+  .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700}
+  .badge.pending{background:#fff8e1;color:#a07800}
+  .badge.approved{background:#e8f5e9;color:#22aa55}
+  .badge.rejected{background:#fdecea;color:#c0392b}
+  .money{font-weight:700;color:#004aef}
+  .ly-do{font-size:12px;color:#c0392b;margin-top:3px}
+  .nv-email{font-size:12px;color:#888}
+  @media(max-width:600px){.stats{grid-template-columns:1fr 1fr}.topbar{padding:12px 16px}.main{padding:16px}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <div style="font-size:32px;margin-bottom:12px">📒</div>
+    <h1>Kế toán — Duyệt chi</h1>
+    <p>SEONGON Finance Dashboard</p>
+    <input type="password" id="pwd" placeholder="Nhập mật khẩu kế toán" onkeydown="if(event.key==='Enter')doLogin()">
+    <button onclick="doLogin()">Đăng nhập</button>
+    <div class="login-err" id="login-err">Sai mật khẩu, thử lại.</div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+  <div class="topbar">
+    <span class="title">📒 Kế toán Duyệt chi — SEONGON</span>
+    <span class="logout" onclick="doLogout()">Đăng xuất</span>
+  </div>
+  <div class="main">
+    <div class="stats" id="stats">
+      <div class="stat-card"><div class="num" id="s-total">—</div><div class="label">Tổng đề xuất</div></div>
+      <div class="stat-card"><div class="num" id="s-pending" style="color:#a07800">—</div><div class="label">Chờ duyệt</div></div>
+      <div class="stat-card approved"><div class="num" id="s-approved">—</div><div class="label">Đã duyệt</div></div>
+      <div class="stat-card rejected"><div class="num" id="s-rejected">—</div><div class="label">Từ chối</div></div>
+      <div class="stat-card"><div class="num" id="s-money" style="font-size:18px">—</div><div class="label">Tổng đã duyệt</div></div>
+    </div>
+
+    <div class="toolbar">
+      <input type="text" id="search-input" placeholder="Tìm tên, nội dung, đơn vị..." oninput="loadData()">
+      <select id="filter-status" onchange="loadData()">
+        <option value="">Tất cả trạng thái</option>
+        <option value="pending">Chờ duyệt</option>
+        <option value="approved">Đã duyệt</option>
+        <option value="rejected">Từ chối</option>
+      </select>
+      <button onclick="loadData()">🔄 Làm mới</button>
+      <button class="export" onclick="exportCSV()">📥 Xuất CSV</button>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Người đề xuất</th>
+          <th>Nội dung</th>
+          <th>Chi cho</th>
+          <th>Số tiền</th>
+          <th>Thông tin nhận</th>
+          <th>Trạng thái</th>
+          <th>Ngày tạo</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+let TOKEN = localStorage.getItem('kt_token') || '';
+
+function fmtMoney(n) {
+  return parseInt(n).toLocaleString('vi-VN') + ' đ';
+}
+function fmtDate(s) {
+  if (!s) return '';
+  const d = new Date(s);
+  return d.toLocaleDateString('vi-VN') + ' ' + d.toLocaleTimeString('vi-VN', {hour:'2-digit',minute:'2-digit'});
+}
+
+async function doLogin() {
+  const pwd = document.getElementById('pwd').value;
+  const res = await fetch('/api/ke-toan?action=login', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({password: pwd})
+  });
+  const r = await res.json();
+  if (r.success) {
+    TOKEN = r.token;
+    localStorage.setItem('kt_token', TOKEN);
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    loadData();
+  } else {
+    document.getElementById('login-err').style.display = 'block';
+  }
+}
+
+function doLogout() {
+  TOKEN = '';
+  localStorage.removeItem('kt_token');
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('dashboard').style.display = 'none';
+}
+
+async function loadData() {
+  const status = document.getElementById('filter-status').value;
+  const search = document.getElementById('search-input').value;
+  let url = '/api/ke-toan?action=list';
+  if (status) url += '&status=' + encodeURIComponent(status);
+  if (search) url += '&search=' + encodeURIComponent(search);
+
+  const res = await fetch(url, {headers:{'Authorization':'Bearer '+TOKEN}});
+  if (res.status === 401) { doLogout(); return; }
+  const r = await res.json();
+  if (!r.success) return;
+
+  const data = r.data;
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = '';
+
+  let total = data.length, pending = 0, approved = 0, rejected = 0, moneyApproved = 0;
+  data.forEach(row => {
+    if (row.trang_thai === 'pending') pending++;
+    if (row.trang_thai === 'approved') { approved++; moneyApproved += row.so_tien; }
+    if (row.trang_thai === 'rejected') rejected++;
+
+    const badgeMap = {pending:'⏳ Chờ duyệt', approved:'✅ Duyệt', rejected:'❌ Từ chối'};
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${row.id}</td>
+      <td><strong>${row.nv_name}</strong><br><span class="nv-email">${row.nv_email}</span></td>
+      <td>${row.noi_dung}</td>
+      <td>${row.chi_cho_ai}</td>
+      <td class="money">${fmtMoney(row.so_tien)}</td>
+      <td style="font-size:13px;white-space:pre-line">${row.thong_tin_nhan}</td>
+      <td>
+        <span class="badge ${row.trang_thai}">${badgeMap[row.trang_thai]||row.trang_thai}</span>
+        ${row.ly_do ? `<div class="ly-do">${row.ly_do}</div>` : ''}
+      </td>
+      <td style="white-space:nowrap;font-size:13px">${fmtDate(row.created_at)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById('s-total').textContent = total;
+  document.getElementById('s-pending').textContent = pending;
+  document.getElementById('s-approved').textContent = approved;
+  document.getElementById('s-rejected').textContent = rejected;
+  document.getElementById('s-money').textContent = moneyApproved ? moneyApproved.toLocaleString('vi-VN') + ' đ' : '0 đ';
+}
+
+function exportCSV() {
+  const a = document.createElement('a');
+  a.href = '/api/ke-toan?action=export&_token=' + encodeURIComponent(TOKEN);
+  // Use Authorization header via fetch for CSV
+  fetch('/api/ke-toan?action=export', {headers:{'Authorization':'Bearer '+TOKEN}})
+    .then(r => r.blob())
+    .then(blob => {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'duyet-chi.csv'; a.click();
+      URL.revokeObjectURL(url);
+    });
+}
+
+// Auto-login if token saved
+if (TOKEN) {
+  fetch('/api/ke-toan?action=list', {headers:{'Authorization':'Bearer '+TOKEN}})
+    .then(r => {
+      if (r.ok) {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+        loadData();
+      } else { TOKEN = ''; localStorage.removeItem('kt_token'); }
+    });
+}
+</script>
+</body>
+</html>

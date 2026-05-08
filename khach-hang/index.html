@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sổ khách hàng — SEONGON CRM</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--blue:#004aef;--yellow:#ffce00;--dark:#001a80;--red:#e53e3e;--green:#38a169;--gray:#f0f4ff}
+    body{font-family:'Inter',sans-serif;background:#f0f4ff;color:#1a1a2e}
+
+    /* Login */
+    #login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--blue),var(--dark))}
+    .login-card{background:#fff;border-radius:20px;padding:40px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,0.2);text-align:center}
+    .login-logo{font-family:'Bricolage Grotesque',sans-serif;font-size:22px;font-weight:700;color:var(--blue);margin-bottom:8px}
+    .login-sub{font-size:13px;color:#888;margin-bottom:28px}
+    .login-card input{width:100%;padding:13px 16px;border:2px solid #e8ecf4;border-radius:10px;font-size:15px;margin-bottom:14px;font-family:'Inter',sans-serif}
+    .login-card input:focus{outline:none;border-color:var(--blue)}
+    .login-btn{width:100%;padding:14px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;font-family:'Bricolage Grotesque',sans-serif}
+    .login-btn:hover{background:var(--dark)}
+    .login-err{color:var(--red);font-size:13px;margin-top:10px;display:none}
+
+    /* Main app */
+    #app{display:none}
+    .topbar{background:linear-gradient(135deg,var(--blue),var(--dark));padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
+    .topbar-title{font-family:'Bricolage Grotesque',sans-serif;font-size:18px;font-weight:700;color:#fff}
+    .topbar-title span{color:var(--yellow)}
+    .topbar-actions{display:flex;gap:8px}
+    .btn{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:all 0.15s}
+    .btn-yellow{background:var(--yellow);color:var(--dark)}
+    .btn-yellow:hover{background:#e6b800}
+    .btn-outline{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,0.5)}
+    .btn-outline:hover{background:rgba(255,255,255,0.1)}
+    .btn-blue{background:var(--blue);color:#fff}
+    .btn-blue:hover{background:var(--dark)}
+    .btn-red{background:var(--red);color:#fff}
+    .btn-green{background:var(--green);color:#fff}
+    .btn-sm{padding:5px 12px;font-size:12px}
+
+    .toolbar{padding:16px 24px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;background:#fff;border-bottom:1px solid #eef}
+    .search-box{flex:1;min-width:200px;padding:9px 14px;border:2px solid #e8ecf4;border-radius:8px;font-size:14px;font-family:'Inter',sans-serif}
+    .search-box:focus{outline:none;border-color:var(--blue)}
+    select.filter{padding:9px 14px;border:2px solid #e8ecf4;border-radius:8px;font-size:14px;font-family:'Inter',sans-serif;cursor:pointer}
+    select.filter:focus{outline:none;border-color:var(--blue)}
+
+    .stats-bar{display:flex;gap:12px;padding:16px 24px;overflow-x:auto}
+    .stat-chip{background:#fff;border-radius:10px;padding:12px 18px;display:flex;align-items:center;gap:8px;box-shadow:0 2px 8px rgba(0,74,239,0.08);white-space:nowrap}
+    .stat-chip .num{font-family:'Bricolage Grotesque',sans-serif;font-size:20px;font-weight:700;color:var(--blue)}
+    .stat-chip .lbl{font-size:12px;color:#666}
+
+    /* Table */
+    .table-wrap{padding:0 24px 24px;overflow-x:auto}
+    table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,74,239,0.08)}
+    th{background:var(--blue);color:#fff;padding:12px 14px;text-align:left;font-size:13px;font-weight:600;white-space:nowrap}
+    td{padding:12px 14px;border-bottom:1px solid #f0f4ff;font-size:14px;vertical-align:middle}
+    tr:last-child td{border-bottom:none}
+    tr:hover td{background:#f8f9ff}
+
+    .badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600}
+    .badge-new{background:#e8f4ff;color:var(--blue)}
+    .badge-contacted{background:#fff8e1;color:#b7791f}
+    .badge-proposal{background:#e8f5e9;color:var(--green)}
+    .badge-won{background:#004aef;color:#fff}
+    .badge-lost{background:#fef2f2;color:var(--red)}
+
+    /* Modal */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100;display:none;align-items:center;justify-content:center;padding:16px}
+    .modal-overlay.open{display:flex}
+    .modal{background:#fff;border-radius:16px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.2)}
+    .modal-header{padding:20px 24px;border-bottom:1px solid #eef;display:flex;justify-content:space-between;align-items:center}
+    .modal-header h3{font-family:'Bricolage Grotesque',sans-serif;font-size:17px;font-weight:700;color:var(--dark)}
+    .modal-close{background:none;border:none;font-size:22px;cursor:pointer;color:#888;line-height:1}
+    .modal-body{padding:24px}
+    .modal-footer{padding:16px 24px;border-top:1px solid #eef;display:flex;gap:10px;justify-content:flex-end}
+    .form-group{margin-bottom:16px}
+    .form-group label{display:block;font-size:13px;font-weight:600;color:#333;margin-bottom:6px}
+    .form-group input,.form-group select,.form-group textarea{width:100%;padding:11px 14px;border:2px solid #e8ecf4;border-radius:8px;font-size:14px;font-family:'Inter',sans-serif}
+    .form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--blue)}
+    .form-group textarea{resize:vertical;min-height:80px}
+
+    /* Activities */
+    .activity-list{display:flex;flex-direction:column;gap:10px;max-height:300px;overflow-y:auto}
+    .activity-item{background:#f0f4ff;border-radius:8px;padding:12px;font-size:13px}
+    .activity-time{color:#888;font-size:11px;margin-top:4px}
+    .activity-input-row{display:flex;gap:8px;margin-top:12px}
+    .activity-input-row input{flex:1;padding:9px 12px;border:2px solid #e8ecf4;border-radius:8px;font-size:14px;font-family:'Inter',sans-serif}
+    .activity-input-row input:focus{outline:none;border-color:var(--blue)}
+
+    .empty{text-align:center;padding:40px;color:#aaa;font-size:14px}
+    @media(max-width:640px){.table-wrap{padding:0 12px 12px}.toolbar{padding:12px}.stats-bar{padding:12px}}
+  </style>
+</head>
+<body>
+
+<!-- Login -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">🔐 SEONGON CRM</div>
+    <div class="login-sub">Sổ tay khách hàng nội bộ</div>
+    <input type="password" id="pw-input" placeholder="Nhập mật khẩu..." onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">Đăng nhập</button>
+    <div class="login-err" id="login-err">❌ Sai mật khẩu, thử lại</div>
+  </div>
+</div>
+
+<!-- App -->
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-title">📋 SEONGON <span>CRM</span></div>
+    <div class="topbar-actions">
+      <button class="btn btn-yellow" onclick="openAddModal()">+ Thêm khách</button>
+      <button class="btn btn-outline" onclick="exportCSV()">⬇ CSV</button>
+      <button class="btn btn-outline" onclick="logout()">Đăng xuất</button>
+    </div>
+  </div>
+
+  <div class="stats-bar" id="stats-bar">
+    <div class="stat-chip"><span class="num" id="stat-total">0</span><span class="lbl">Tổng khách</span></div>
+    <div class="stat-chip"><span class="num" id="stat-new">0</span><span class="lbl">Mới</span></div>
+    <div class="stat-chip"><span class="num" id="stat-won">0</span><span class="lbl">Chốt deal</span></div>
+  </div>
+
+  <div class="toolbar">
+    <input class="search-box" type="text" id="search-input" placeholder="🔍 Tìm tên, email, SĐT..." oninput="loadList()">
+    <select class="filter" id="status-filter" onchange="loadList()">
+      <option value="">Tất cả trạng thái</option>
+      <option>Mới</option>
+      <option>Đã liên hệ</option>
+      <option>Đang tư vấn</option>
+      <option>Đã báo giá</option>
+      <option>Chốt deal</option>
+      <option>Không phù hợp</option>
+    </select>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Họ tên</th>
+          <th>Email</th>
+          <th>Điện thoại</th>
+          <th>Dịch vụ</th>
+          <th>Trạng thái</th>
+          <th>Ngày tạo</th>
+          <th>Thao tác</th>
+        </tr>
+      </thead>
+      <tbody id="customer-tbody">
+        <tr><td colspan="8" class="empty">Đang tải...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Add/Edit Modal -->
+<div class="modal-overlay" id="add-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-title">Thêm khách hàng</h3>
+      <button class="modal-close" onclick="closeModal('add-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-id">
+      <div class="form-group"><label>Họ tên *</label><input type="text" id="f-name" placeholder="Nguyễn Văn A" maxlength="100"></div>
+      <div class="form-group"><label>Email *</label><input type="email" id="f-email" placeholder="email@congty.com" maxlength="200"></div>
+      <div class="form-group"><label>Điện thoại</label><input type="tel" id="f-phone" placeholder="0901 234 567" maxlength="20"></div>
+      <div class="form-group"><label>Dịch vụ</label>
+        <select id="f-service">
+          <option value="">Chưa chọn</option>
+          <option>SEO AI Max</option><option>GEO</option>
+          <option>Google Ads</option><option>Total Business Maps</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Trạng thái</label>
+        <select id="f-status">
+          <option>Mới</option><option>Đã liên hệ</option>
+          <option>Đang tư vấn</option><option>Đã báo giá</option>
+          <option>Chốt deal</option><option>Không phù hợp</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Ghi chú</label><textarea id="f-note" placeholder="Ghi chú thêm..." maxlength="500"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" style="color:#333;border-color:#ccc" onclick="closeModal('add-modal')">Hủy</button>
+      <button class="btn btn-blue" onclick="saveCustomer()">💾 Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- Activity Modal -->
+<div class="modal-overlay" id="activity-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="act-title">Lịch sử hoạt động</h3>
+      <button class="modal-close" onclick="closeModal('activity-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="activity-list" id="activity-list"></div>
+      <div class="activity-input-row">
+        <input type="text" id="act-input" placeholder="Ghi chú hoạt động mới..." maxlength="500" onkeydown="if(event.key==='Enter')addActivity()">
+        <button class="btn btn-blue" onclick="addActivity()">Thêm</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let TOKEN = '';
+let currentKhachId = null;
+
+function badgeClass(s) {
+  const m = {'Mới':'badge-new','Đã liên hệ':'badge-contacted','Đang tư vấn':'badge-contacted','Đã báo giá':'badge-proposal','Chốt deal':'badge-won','Không phù hợp':'badge-lost'};
+  return m[s] || 'badge-new';
+}
+
+function fmtDate(s) {
+  if (!s) return '';
+  const d = new Date(s + (s.includes('Z') ? '' : 'Z'));
+  return d.toLocaleDateString('vi-VN');
+}
+
+async function doLogin() {
+  const pw = document.getElementById('pw-input').value;
+  const r = await fetch('/api/crm?action=login', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({password:pw}) });
+  const d = await r.json();
+  if (d.success) {
+    TOKEN = d.token;
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    loadList();
+  } else {
+    document.getElementById('login-err').style.display = 'block';
+  }
+}
+
+function logout() { TOKEN=''; location.reload(); }
+
+async function loadList() {
+  const search = document.getElementById('search-input').value;
+  const status = document.getElementById('status-filter').value;
+  const r = await fetch(`/api/crm?action=list&search=${encodeURIComponent(search)}&status=${encodeURIComponent(status)}`, { headers:{'Authorization':'Bearer '+TOKEN} });
+  const d = await r.json();
+  if (!d.success) return;
+  const rows = d.data || [];
+
+  // Stats
+  document.getElementById('stat-total').textContent = rows.length;
+  document.getElementById('stat-new').textContent = rows.filter(x=>x.trang_thai==='Mới').length;
+  document.getElementById('stat-won').textContent = rows.filter(x=>x.trang_thai==='Chốt deal').length;
+
+  const tbody = document.getElementById('customer-tbody');
+  if (!rows.length) { tbody.innerHTML = '<tr><td colspan="8" class="empty">Chưa có khách hàng nào</td></tr>'; return; }
+  tbody.innerHTML = rows.map(r => `
+    <tr>
+      <td>${r.id}</td>
+      <td><strong>${esc(r.ho_ten)}</strong></td>
+      <td>${esc(r.email)}</td>
+      <td>${esc(r.dien_thoai||'')}</td>
+      <td>${esc(r.dich_vu||'')}</td>
+      <td><span class="badge ${badgeClass(r.trang_thai)}">${esc(r.trang_thai)}</span></td>
+      <td>${fmtDate(r.created_at)}</td>
+      <td>
+        <button class="btn btn-sm btn-blue" onclick="openEdit(${r.id})">✏️</button>
+        <button class="btn btn-sm btn-green" style="margin:0 4px" onclick="openActivity(${r.id},'${esc(r.ho_ten)}')">📝</button>
+        <button class="btn btn-sm btn-red" onclick="deleteCustomer(${r.id},'${esc(r.ho_ten)}')">🗑</button>
+      </td>
+    </tr>`).join('');
+}
+
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function openAddModal() {
+  document.getElementById('modal-title').textContent = 'Thêm khách hàng';
+  document.getElementById('edit-id').value = '';
+  ['f-name','f-email','f-phone','f-note'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-service').value = '';
+  document.getElementById('f-status').value = 'Mới';
+  document.getElementById('add-modal').classList.add('open');
+}
+
+async function openEdit(id) {
+  const r = await fetch(`/api/crm?action=list`, { headers:{'Authorization':'Bearer '+TOKEN} });
+  const d = await r.json();
+  const row = (d.data||[]).find(x=>x.id===id);
+  if (!row) return;
+  document.getElementById('modal-title').textContent = 'Chỉnh sửa khách hàng';
+  document.getElementById('edit-id').value = id;
+  document.getElementById('f-name').value = row.ho_ten||'';
+  document.getElementById('f-email').value = row.email||'';
+  document.getElementById('f-phone').value = row.dien_thoai||'';
+  document.getElementById('f-service').value = row.dich_vu||'';
+  document.getElementById('f-status').value = row.trang_thai||'Mới';
+  document.getElementById('f-note').value = row.ghi_chu||'';
+  document.getElementById('add-modal').classList.add('open');
+}
+
+async function saveCustomer() {
+  const id = document.getElementById('edit-id').value;
+  const body = { id: id?+id:undefined, ho_ten:document.getElementById('f-name').value, email:document.getElementById('f-email').value, dien_thoai:document.getElementById('f-phone').value, dich_vu:document.getElementById('f-service').value, trang_thai:document.getElementById('f-status').value, ghi_chu:document.getElementById('f-note').value };
+  const method = id ? 'PUT' : 'POST';
+  const action = id ? 'update' : 'add';
+  await fetch(`/api/crm?action=${action}`, { method, headers:{'Content-Type':'application/json','Authorization':'Bearer '+TOKEN}, body:JSON.stringify(body) });
+  closeModal('add-modal');
+  loadList();
+}
+
+async function deleteCustomer(id, name) {
+  if (!confirm(`Xóa khách hàng "${name}"?`)) return;
+  await fetch(`/api/crm?action=delete&id=${id}`, { method:'DELETE', headers:{'Authorization':'Bearer '+TOKEN} });
+  loadList();
+}
+
+async function openActivity(id, name) {
+  currentKhachId = id;
+  document.getElementById('act-title').textContent = `📝 Hoạt động — ${name}`;
+  document.getElementById('act-input').value = '';
+  document.getElementById('activity-modal').classList.add('open');
+  await loadActivities();
+}
+
+async function loadActivities() {
+  const r = await fetch(`/api/crm?action=activities&khach_id=${currentKhachId}`, { headers:{'Authorization':'Bearer '+TOKEN} });
+  const d = await r.json();
+  const list = document.getElementById('activity-list');
+  const rows = d.data||[];
+  if (!rows.length) { list.innerHTML = '<div class="empty" style="padding:20px">Chưa có hoạt động nào</div>'; return; }
+  list.innerHTML = rows.map(a=>`<div class="activity-item">${esc(a.noi_dung)}<div class="activity-time">${fmtDate(a.created_at)}</div></div>`).join('');
+}
+
+async function addActivity() {
+  const txt = document.getElementById('act-input').value.trim();
+  if (!txt) return;
+  await fetch('/api/crm?action=add_activity', { method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+TOKEN}, body:JSON.stringify({khach_id:currentKhachId,noi_dung:txt}) });
+  document.getElementById('act-input').value = '';
+  await loadActivities();
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function exportCSV() { window.location.href = '/api/crm?action=export&token=' + encodeURIComponent(TOKEN); }
+
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(el => el.addEventListener('click', e => { if(e.target===el) el.classList.remove('open'); }));
+</script>
+</body>
+</html>

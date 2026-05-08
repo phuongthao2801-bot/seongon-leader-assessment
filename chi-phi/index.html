@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Đề xuất chi phí — SEONGON</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f4ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+  .card{background:#fff;border-radius:16px;box-shadow:0 4px 24px rgba(0,74,239,.12);max-width:520px;width:100%;padding:40px 36px}
+  .logo{display:flex;align-items:center;gap:10px;margin-bottom:28px}
+  .logo-icon{width:40px;height:40px;background:#004aef;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px}
+  .logo-text{font-weight:800;font-size:18px;color:#004aef}
+  h1{font-size:22px;color:#111;font-weight:700;margin-bottom:6px}
+  .sub{color:#666;font-size:14px;margin-bottom:28px}
+  .field{margin-bottom:18px}
+  label{display:block;font-size:13px;font-weight:600;color:#333;margin-bottom:6px}
+  label span{color:#e33}
+  input,textarea,select{width:100%;padding:11px 14px;border:1.5px solid #dde3f5;border-radius:8px;font-size:15px;color:#111;outline:none;transition:.2s;font-family:inherit}
+  input:focus,textarea:focus,select:focus{border-color:#004aef;box-shadow:0 0 0 3px rgba(0,74,239,.1)}
+  textarea{resize:vertical;min-height:80px}
+  .so-tien-wrap{position:relative}
+  .so-tien-wrap input{padding-right:50px}
+  .vnd{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:#888;font-size:13px;font-weight:600}
+  .btn{width:100%;padding:14px;background:#004aef;color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;margin-top:8px;transition:.2s}
+  .btn:hover{background:#0036c0}
+  .btn:disabled{background:#aaa;cursor:not-allowed}
+  .success-box{display:none;text-align:center;padding:32px 20px}
+  .success-icon{font-size:56px;margin-bottom:16px}
+  .success-box h2{font-size:22px;color:#004aef;font-weight:700;margin-bottom:10px}
+  .success-box p{color:#555;line-height:1.6}
+  .note{background:#fff8e1;border-left:3px solid #ffce00;padding:10px 14px;border-radius:6px;font-size:13px;color:#7a6000;margin-bottom:22px}
+  .divider{height:1px;background:#eee;margin:20px 0}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">
+    <div class="logo-icon">💰</div>
+    <span class="logo-text">SEONGON</span>
+  </div>
+
+  <div id="form-section">
+    <h1>Đề xuất chi phí</h1>
+    <p class="sub">Điền thông tin bên dưới — Thảo sẽ duyệt qua Telegram và bạn sẽ nhận kết quả qua email.</p>
+
+    <div class="note">⏱ Thời gian duyệt thông thường: trong giờ làm việc (~15 phút). Ngoài giờ: sáng hôm sau.</div>
+
+    <form id="chi-phi-form">
+      <div class="field">
+        <label>Họ và tên <span>*</span></label>
+        <input type="text" name="nv_name" placeholder="VD: Nguyễn Văn An" required>
+      </div>
+      <div class="field">
+        <label>Email nhận kết quả <span>*</span></label>
+        <input type="email" name="nv_email" placeholder="email@seongon.com" required>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="field">
+        <label>Nội dung chi <span>*</span></label>
+        <textarea name="noi_dung" placeholder="VD: Mua công cụ Ahrefs tháng 5/2026 phục vụ SEO cho KH ABC" required></textarea>
+      </div>
+      <div class="field">
+        <label>Chi cho ai / Đơn vị nhận <span>*</span></label>
+        <input type="text" name="chi_cho_ai" placeholder="VD: Ahrefs Inc. / Nguyễn Thị Bình (lương thưởng)" required>
+      </div>
+      <div class="field">
+        <label>Số tiền (VNĐ) <span>*</span></label>
+        <div class="so-tien-wrap">
+          <input type="text" name="so_tien" id="so_tien" placeholder="VD: 5.000.000" required inputmode="numeric">
+          <span class="vnd">VNĐ</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Thông tin nhận tiền <span>*</span></label>
+        <textarea name="thong_tin_nhan" placeholder="VD: Ngân hàng Vietcombank&#10;STK: 0123456789&#10;Chủ TK: Nguyen Thi Binh&#10;Chi nhánh: HCM" required></textarea>
+      </div>
+
+      <button type="submit" class="btn" id="submit-btn">📤 Gửi đề xuất</button>
+    </form>
+  </div>
+
+  <div class="success-box" id="success-section">
+    <div class="success-icon">✅</div>
+    <h2>Đã gửi đề xuất!</h2>
+    <p>Thảo đã nhận được thông báo trên Telegram.<br>Bạn sẽ nhận email kết quả khi được duyệt hoặc từ chối.<br><br>Thời gian duyệt thông thường: <strong>trong giờ làm việc.</strong></p>
+  </div>
+</div>
+
+<script>
+// Format số tiền với dấu chấm
+document.getElementById('so_tien').addEventListener('input', function(e) {
+  let v = e.target.value.replace(/\D/g, '');
+  e.target.value = v ? parseInt(v).toLocaleString('vi-VN') : '';
+});
+
+document.getElementById('chi-phi-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Đang gửi...';
+
+  const fd = new FormData(e.target);
+  // Chuyển số tiền về số thuần
+  const soTienRaw = fd.get('so_tien').toString().replace(/\./g, '').replace(/,/g, '');
+  fd.set('so_tien', soTienRaw);
+
+  const data = Object.fromEntries(fd);
+
+  try {
+    const res = await fetch('/api/chi-phi', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(data)
+    });
+    const r = await res.json();
+    if (r.success) {
+      document.getElementById('form-section').style.display = 'none';
+      document.getElementById('success-section').style.display = 'block';
+    } else {
+      alert('Lỗi: ' + (r.error || 'Không rõ. Thử lại nhé.'));
+      btn.disabled = false;
+      btn.textContent = '📤 Gửi đề xuất';
+    }
+  } catch(err) {
+    alert('Mất kết nối. Vui lòng thử lại.');
+    btn.disabled = false;
+    btn.textContent = '📤 Gửi đề xuất';
+  }
+});
+</script>
+</body>
+</html>
