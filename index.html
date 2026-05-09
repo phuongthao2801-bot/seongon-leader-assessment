@@ -220,15 +220,41 @@
 
   /* ── CTA SECTION ── */
   .cta-section {
-    padding: 80px 40px;
+    padding: 0;
     background: linear-gradient(135deg, #001a80, #004aef);
-    text-align: center; color: white;
+    color: white;
+    overflow: hidden;
   }
-  .cta-inner { max-width: 700px; margin: 0 auto; }
-  .cta-section .section-title { color: white; margin-bottom: 16px; }
+  .cta-inner {
+    max-width: 1100px; margin: 0 auto;
+    display: grid; grid-template-columns: 420px 1fr;
+    align-items: stretch; min-height: 520px;
+  }
+  .cta-photo {
+    position: relative; overflow: hidden;
+  }
+  .cta-photo img {
+    width: 100%; height: 100%;
+    object-fit: cover; object-position: center top;
+    display: block;
+  }
+  .cta-content {
+    padding: 72px 60px; display: flex;
+    flex-direction: column; justify-content: center;
+  }
+  .cta-section .section-label { color: var(--yellow); }
+  .cta-section .section-title { color: white; margin-bottom: 16px; text-align: left; }
   .cta-section .section-title em { color: var(--yellow); }
-  .cta-section p { font-size: 16px; opacity: 0.8; margin-bottom: 36px; }
-  .cta-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+  .cta-section .cta-content p { font-size: 16px; opacity: 0.8; margin-bottom: 36px; text-align: left; }
+  .cta-buttons { display: flex; gap: 16px; flex-wrap: wrap; }
+  @media(max-width: 768px) {
+    .cta-inner { grid-template-columns: 1fr; }
+    .cta-photo { height: 300px; }
+    .cta-content { padding: 48px 28px; }
+    .cta-section .section-title { text-align: center; }
+    .cta-section .cta-content p { text-align: center; }
+    .cta-buttons { justify-content: center; }
+  }
 
   /* ── FOOTER ── */
   footer {
@@ -265,7 +291,7 @@
       <p class="hero-bio">Tôi là Ngô Phương Thảo - CCO tại SEONGON - AI Search Marketing Growth Partner hàng đầu Việt Nam. Với hơn 14 năm kinh nghiệm với Digital Marketing, tôi đã đồng hành cùng hàng trăm doanh nghiệp vừa và lớn tăng trưởng bền vững qua các giải pháp SEO và Digital Marketing toàn diện.</p>
       <div class="hero-cta">
         <a href="#dat-lich" class="btn-primary">📅 Đặt lịch gặp tôi</a>
-        <a href="mailto:ngophuongthao@seongon.com" class="btn-secondary">✉️ Gửi email</a>
+        <a href="#" id="email-hero" class="btn-secondary">✉️ Gửi email</a>
         <a href="https://seongon.com" target="_blank" rel="noopener noreferrer" class="btn-secondary">🌐 SEONGON</a>
       </div>
     </div>
@@ -327,6 +353,24 @@
     <span class="section-label">Về tôi</span>
     <h2 class="section-title">Hành trình <em>14 năm</em> đồng hành<br>cùng doanh nghiệp Việt</h2>
     <p class="about-text">14 năm trong ngành Digital Marketing đã cho tôi cơ hội được đồng hành cùng hơn 20 doanh nghiệp lớn nhỏ như Sun World, Richy, Sim Thăng Long... trong hành trình xây dựng thương hiệu số bền vững. Trước khi gắn bó với SEONGON, tôi đã tích lũy kinh nghiệm thực chiến tại BioSpring và Mazda Việt Nam, nơi tôi hiểu rằng Marketing hiệu quả phải đo được bằng kết quả kinh doanh thực tế. Tôi cũng là giảng viên Google Marketing tại SEONGON và Học viện IM Group, vì tôi tin rằng chia sẻ kiến thức là cách nhanh nhất để nâng tầm cả ngành. Là diễn giả tại Diễn đàn CSMO - VSMCamp và giám khảo Marketing Hive, Marketing On Air NEU nhiều năm liên tiếp, tôi luôn tìm cách kết nối thế hệ làm marketing kế tiếp với những bài học thực tiễn nhất. Với tôi, mỗi chiến dịch không chỉ là con số, đó là câu chuyện tăng trưởng của một doanh nghiệp, một con người.</p>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px;">
+      <div style="overflow:hidden;border-radius:16px;aspect-ratio:4/3;box-shadow:0 4px 20px rgba(0,0,0,.10);">
+        <img src="/images/thao-1.jpg" alt="Ngô Phương Thảo diễn thuyết tại SEO Leading 2024"
+          style="width:100%;height:100%;object-fit:cover;object-position:center top;transition:transform .4s ease;"
+          onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+      </div>
+      <div style="overflow:hidden;border-radius:16px;aspect-ratio:4/3;box-shadow:0 4px 20px rgba(0,0,0,.10);">
+        <img src="/images/thao-2.jpg" alt="Ngô Phương Thảo tại sự kiện Brand Walkers"
+          style="width:100%;height:100%;object-fit:cover;object-position:center top;transition:transform .4s ease;"
+          onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+      </div>
+      <div style="overflow:hidden;border-radius:16px;aspect-ratio:4/3;box-shadow:0 4px 20px rgba(0,0,0,.10);">
+        <img src="/images/thao-3.jpg" alt="Ngô Phương Thảo"
+          style="width:100%;height:100%;object-fit:cover;object-position:center top;transition:transform .4s ease;"
+          onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+      </div>
+    </div>
   </div>
 </section>
 
@@ -358,12 +402,17 @@
 <!-- CTA -->
 <section class="cta-section" id="dat-lich">
   <div class="cta-inner">
-    <span class="section-label" style="color:var(--yellow)">Kết nối</span>
-    <h2 class="section-title">Sẵn sàng <em>tăng trưởng</em><br>cùng nhau?</h2>
-    <p>Đặt lịch 30 phút để trao đổi về chiến lược Digital Marketing cho doanh nghiệp của bạn.</p>
-    <div class="cta-buttons">
-      <a href="mailto:ngophuongthao@seongon.com" class="btn-primary">✉️ ngophuongthao@seongon.com</a>
-      <a href="https://seongon.com" target="_blank" rel="noopener noreferrer" class="btn-secondary">🌐 seongon.com</a>
+    <div class="cta-photo">
+      <img src="/images/thao-3.jpg" alt="Ngô Phương Thảo — CCO SEONGON">
+    </div>
+    <div class="cta-content">
+      <span class="section-label">Kết nối</span>
+      <h2 class="section-title">Sẵn sàng <em>tăng trưởng</em><br>cùng nhau?</h2>
+      <p>Đặt lịch 30 phút để trao đổi về chiến lược Digital Marketing cho doanh nghiệp của bạn.</p>
+      <div class="cta-buttons">
+        <a href="#" id="email-cta" class="btn-primary">✉️ Gửi email cho Thảo</a>
+        <a href="https://seongon.com" target="_blank" rel="noopener noreferrer" class="btn-secondary">🌐 seongon.com</a>
+      </div>
     </div>
   </div>
 </section>
@@ -373,6 +422,20 @@
   <div>© 2026 Ngô Phương Thảo · <a href="https://seongon.com">SEONGON</a> · AI Search Marketing Growth Partner</div>
   <div class="abs-badge">Tạo trong khóa <a href="https://agentboss.vn/starter" target="_blank" rel="noopener noreferrer">Agent Boss Starter — agentboss.vn/starter</a></div>
 </footer>
+
+<script>
+// Build email href at runtime — bypasses Cloudflare Email Obfuscation
+(function() {
+  var u = 'ngophuongthao';
+  var d = 'seongon.com';
+  var ml = 'mai' + 'lto:' + u + '\x40' + d;
+  var ids = ['email-hero', 'email-cta'];
+  ids.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.href = ml;
+  });
+})();
+</script>
 
 </body>
 </html>
