@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chương Trình Đánh Giá Năng Lực Quản Lý Cấp Trung 2026 – SEONGON</title>
+<style>
+  :root {
+    --primary: #1a56db;
+    --primary-dark: #1e429f;
+    --bg: #f3f4f6;
+    --card: #ffffff;
+    --text: #111827;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+
+  /* HEADER */
+  .site-header {
+    background: linear-gradient(135deg, #1a56db 0%, #6d28d9 100%);
+    color: white; padding: 28px 24px; text-align: center;
+  }
+  .site-header .logo { font-size: 11px; font-weight: 700; letter-spacing: 3px; opacity: .7; margin-bottom: 6px; }
+  .site-header h1 { font-size: clamp(18px, 4vw, 26px); font-weight: 800; margin-bottom: 6px; }
+  .site-header p { font-size: 14px; opacity: .8; }
+
+  /* STEP PROGRESS */
+  .step-nav {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    padding: 16px 20px;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,.07);
+  }
+  .step-track {
+    display: flex; align-items: center; gap: 0;
+    max-width: 720px; margin: 0 auto;
+  }
+  .step-dot-wrap {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    flex: 1; position: relative;
+  }
+  .step-dot {
+    width: 32px; height: 32px; border-radius: 50%;
+    border: 2.5px solid var(--border);
+    background: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: var(--muted);
+    transition: all .3s; position: relative; z-index: 2; cursor: default;
+  }
+  .step-dot.done { border-color: #22c55e; background: #22c55e; color: white; }
+  .step-dot.active { border-color: var(--primary); background: var(--primary); color: white; box-shadow: 0 0 0 4px rgba(26,86,219,.15); }
+  .step-label { font-size: 10px; color: var(--muted); text-align: center; line-height: 1.2; max-width: 64px; display: none; }
+  @media(min-width: 540px) { .step-label { display: block; } }
+  .step-line {
+    height: 2.5px; background: var(--border); flex: 1; margin-top: -18px; z-index: 1; transition: background .3s;
+    position: relative; top: -10px;
+  }
+  .step-line.done { background: #22c55e; }
+
+  /* INFO STEP */
+  .info-step { display: block; }
+  .info-card {
+    background: var(--card); border-radius: 20px; padding: 32px 28px;
+    box-shadow: 0 2px 12px rgba(0,0,0,.08); border: 1px solid var(--border);
+    max-width: 560px; margin: 0 auto;
+  }
+  .info-card h2 { font-size: 17px; font-weight: 800; margin-bottom: 6px; color: var(--primary); }
+  .info-card .subtitle { font-size: 13.5px; color: var(--muted); margin-bottom: 24px; line-height: 1.5; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+  .form-group label { font-size: 13px; font-weight: 600; color: #374151; }
+  .form-group input {
+    padding: 11px 14px; border: 1.5px solid var(--border); border-radius: 10px;
+    font-size: 14.5px; transition: border-color .2s; background: #fafafa; color: var(--text);
+  }
+  .form-group input:focus { outline: none; border-color: var(--primary); background: white; }
+  .scale-box {
+    background: #f0f4ff; border: 1px solid #c7d7fd; border-radius: 12px;
+    padding: 14px 16px; margin-bottom: 24px;
+  }
+  .scale-box .scale-title { font-size: 13px; font-weight: 700; color: #1e40af; margin-bottom: 10px; }
+  .scale-items { display: flex; gap: 6px; flex-wrap: wrap; }
+  .scale-item {
+    display: flex; align-items: center; gap: 5px; font-size: 12px;
+    background: white; border-radius: 8px; padding: 5px 10px; border: 1px solid #c7d7fd; color: #1e40af;
+  }
+  .scale-item .dot {
+    width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 12px; color: white;
+  }
+
+  /* ROLE STEP */
+  .role-step { display: none; }
+  .role-step.active { display: block; }
+
+  .role-hero {
+    border-radius: 18px; padding: 26px 24px; margin-bottom: 20px; color: white;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .role-hero-num {
+    width: 56px; height: 56px; border-radius: 16px;
+    background: rgba(255,255,255,.2); border: 2px solid rgba(255,255,255,.4);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; font-weight: 900; flex-shrink: 0;
+  }
+  .role-hero-text {}
+  .role-hero-label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; opacity: .75; text-transform: uppercase; }
+  .role-hero-title { font-size: 17px; font-weight: 800; line-height: 1.35; margin-top: 2px; }
+  .role-hero-count { font-size: 12.5px; opacity: .8; margin-top: 4px; }
+
+  /* QUESTIONS */
+  .questions-stack { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+  .q-card {
+    background: white; border-radius: 14px; padding: 18px 20px;
+    border: 1.5px solid var(--border);
+    box-shadow: 0 1px 4px rgba(0,0,0,.05);
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .q-card.answered { border-color: #bbf7d0; }
+  .q-card.unanswered-warn { border-color: #fbbf24; background: #fffbeb; }
+  .q-top { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 14px; }
+  .q-num {
+    width: 26px; height: 26px; border-radius: 8px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 800; color: white; margin-top: 1px;
+  }
+  .q-text { font-size: 14.5px; font-weight: 500; line-height: 1.55; flex: 1; }
+
+  /* RATING */
+  .rating-row { display: flex; gap: 8px; align-items: flex-start; flex-wrap: wrap; }
+  .rating-option { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .rating-btn {
+    width: 44px; height: 44px; border-radius: 11px;
+    border: 2px solid var(--border); background: #f9fafb;
+    cursor: pointer; font-weight: 800; font-size: 17px; color: var(--muted);
+    transition: all .15s; display: flex; align-items: center; justify-content: center;
+  }
+  .rating-btn:hover { transform: scale(1.12); }
+  .rating-btn:hover, .rating-btn.s1:hover { border-color: #ef4444; color: #ef4444; background: #fee2e2; }
+  .rating-btn.s2:hover { border-color: #f97316; color: #f97316; background: #ffedd5; }
+  .rating-btn.s3:hover { border-color: #eab308; color: #ca8a04; background: #fef9c3; }
+  .rating-btn.s4:hover { border-color: #22c55e; color: #16a34a; background: #dcfce7; }
+  .rating-btn.s5:hover { border-color: #3b82f6; color: #2563eb; background: #dbeafe; }
+  .rating-btn.sel-1 { background:#fee2e2; border-color:#ef4444; color:#dc2626; }
+  .rating-btn.sel-2 { background:#ffedd5; border-color:#f97316; color:#ea580c; }
+  .rating-btn.sel-3 { background:#fef9c3; border-color:#eab308; color:#ca8a04; }
+  .rating-btn.sel-4 { background:#dcfce7; border-color:#22c55e; color:#16a34a; }
+  .rating-btn.sel-5 { background:#dbeafe; border-color:#3b82f6; color:#2563eb; }
+  .rating-hint { font-size: 10px; color: var(--muted); line-height: 1.1; text-align: center; max-width: 44px; }
+
+  /* PROGRESS IN ROLE */
+  .role-progress {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+  }
+  .role-prog-bar-bg { flex: 1; height: 6px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .role-prog-bar-fill { height: 100%; border-radius: 99px; transition: width .4s ease; }
+  .role-prog-label { font-size: 12px; color: var(--muted); white-space: nowrap; }
+
+  /* NAV BUTTONS */
+  .step-actions { display: flex; gap: 12px; align-items: center; justify-content: space-between; }
+  .btn-back {
+    padding: 12px 22px; border-radius: 12px; font-size: 14px; font-weight: 700;
+    cursor: pointer; border: 2px solid var(--border); background: white; color: var(--muted);
+    transition: all .15s;
+  }
+  .btn-back:hover { border-color: #9ca3af; color: var(--text); }
+  .btn-next {
+    padding: 13px 32px; border-radius: 12px; font-size: 15px; font-weight: 800;
+    cursor: pointer; border: none; color: white;
+    transition: all .2s; box-shadow: 0 4px 14px rgba(0,0,0,.2);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .btn-next:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.28); }
+  .btn-next:disabled { opacity: .45; transform: none; cursor: not-allowed; box-shadow: none; }
+  .btn-next .arrow { font-size: 18px; transition: transform .2s; }
+  .btn-next:hover .arrow { transform: translateX(4px); }
+
+  .warn-msg { font-size: 13px; font-weight: 600; color: #d97706; margin-top: 8px; text-align: center; }
+
+  /* CONTAINER */
+  .container { max-width: 680px; margin: 0 auto; padding: 28px 16px 80px; }
+
+  /* SLIDE ANIMATION */
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(32px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-32px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  .slide-in  { animation: slideIn .35s ease forwards; }
+  .slide-left { animation: slideInLeft .35s ease forwards; }
+
+  /* ===== RESULTS ===== */
+  #results-section { display: none; }
+  .results-header {
+    background: linear-gradient(135deg, #1a56db, #7c3aed);
+    color: white; border-radius: 20px; padding: 36px 28px;
+    text-align: center; margin-bottom: 24px;
+  }
+  .results-header .mgr-line { font-size: 13px; opacity: .8; margin-bottom: 6px; }
+  .results-header h2 { font-size: 22px; font-weight: 800; margin-bottom: 20px; }
+  .total-ring {
+    width: 140px; height: 140px; border-radius: 50%; margin: 0 auto 16px;
+    border: 3px solid rgba(255,255,255,.4); background: rgba(255,255,255,.12);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .total-ring .big { font-size: 42px; font-weight: 900; line-height: 1; }
+  .total-ring .sub { font-size: 15px; opacity: .7; }
+  .verdict-chip {
+    display: inline-block; background: rgba(255,255,255,.2);
+    border: 1.5px solid rgba(255,255,255,.5);
+    border-radius: 99px; padding: 6px 20px;
+    font-size: 15px; font-weight: 700; margin-top: 6px;
+  }
+
+  .analysis-card {
+    background: var(--card); border-radius: 16px; padding: 24px;
+    margin-bottom: 18px; border: 1px solid var(--border);
+    box-shadow: 0 1px 6px rgba(0,0,0,.06);
+  }
+  .analysis-card h3 {
+    font-size: 16px; font-weight: 800; margin-bottom: 18px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .analysis-card h3 .icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; font-size: 18px;
+  }
+
+  .role-result-row {
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .rr-item { display: flex; flex-direction: column; gap: 6px; }
+  .rr-top { display: flex; align-items: center; gap: 10px; }
+  .rr-badge {
+    width: 30px; height: 30px; border-radius: 8px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 800; color: white;
+  }
+  .rr-name { font-size: 13.5px; font-weight: 600; flex: 1; }
+  .rr-score { font-size: 13px; font-weight: 700; white-space: nowrap; }
+  .rr-bar-bg { height: 8px; background: var(--bg); border-radius: 99px; overflow: hidden; }
+  .rr-bar-fill { height: 100%; border-radius: 99px; transition: width 1s cubic-bezier(.4,0,.2,1); }
+  .rr-verdict { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 99px; }
+  .v-xuatsac { background:#dbeafe;color:#1d4ed8; }
+  .v-tot     { background:#dcfce7;color:#15803d; }
+  .v-kha     { background:#fef9c3;color:#92400e; }
+  .v-tb      { background:#ffedd5;color:#c2410c; }
+  .v-yeu     { background:#fee2e2;color:#b91c1c; }
+
+  .low-list, .strength-list, .sug-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .low-item {
+    border-left: 4px solid; padding: 12px 14px; border-radius: 0 10px 10px 0;
+    background: #fafafa;
+  }
+  .low-item .lt { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+  .low-item .lm { font-size: 12px; color: var(--muted); display: flex; gap: 10px; align-items: center; }
+  .low-item .lscore { font-weight: 700; font-size: 12px; padding: 2px 7px; border-radius: 6px; }
+
+  .str-item {
+    background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px;
+    padding: 12px 14px; font-size: 14px; color: #166534; line-height: 1.5;
+  }
+
+  .sug-item {
+    display: flex; gap: 12px; background: #f8faff;
+    border: 1px solid #e0e7ff; border-radius: 10px; padding: 14px;
+  }
+  .sug-icon { font-size: 22px; flex-shrink: 0; margin-top: 1px; }
+  .sug-title { font-weight: 800; font-size: 14px; color: #1e3a8a; margin-bottom: 4px; }
+  .sug-desc { font-size: 13.5px; color: #374151; line-height: 1.55; }
+
+  .radar-wrap { display: flex; justify-content: center; margin: 8px 0; }
+  canvas#radarChart { max-width: 360px; width: 100%; }
+
+  .action-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 28px; }
+  .btn-outline { padding: 11px 24px; border-radius: 11px; font-size: 14px; font-weight: 700; cursor: pointer; border: 2px solid var(--border); background: white; color: var(--text); transition: all .15s; }
+  .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+  .btn-solid { padding: 11px 24px; border-radius: 11px; font-size: 14px; font-weight: 700; cursor: pointer; background: var(--primary); color: white; border: none; box-shadow: 0 3px 10px rgba(26,86,219,.3); transition: all .2s; }
+  .btn-solid:hover { background: var(--primary-dark); }
+
+  @keyframes fadeUp { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
+  .fade-up { animation: fadeUp .45s ease forwards; }
+
+  @media print {
+    .step-nav, #form-section, .action-row { display: none !important; }
+    #results-section { display: block !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="site-header">
+  <div class="logo">SEONGON · CÔNG CỤ NỘI BỘ</div>
+  <h1>CHƯƠNG TRÌNH ĐÁNH GIÁ NĂNG LỰC QUẢN LÝ CẤP TRUNG 2026</h1>
+  <p>được thiết kế dành riêng cho SEONGON · 35 câu hỏi · 7 vai trò</p>
+</div>
+
+<!-- STEP NAV -->
+<div class="step-nav" id="stepNav">
+  <div class="step-track" id="stepTrack"></div>
+</div>
+
+<div class="container">
+  <div id="form-section">
+
+    <!-- STEP 0: INFO -->
+    <div class="info-step" id="step-0">
+      <div class="info-card slide-in">
+        <h2>Xin chào! 👋</h2>
+        <div class="subtitle">Bộ câu hỏi này giúp bạn tự đánh giá 7 vai trò cốt lõi của một Leader.<br>Điền thông tin bên dưới để bắt đầu nhé.</div>
+        <div class="form-group">
+          <label>Họ và tên *</label>
+          <input type="text" id="mgr-name" placeholder="Nguyễn Văn A">
+        </div>
+        <div class="form-group">
+          <label>Phòng / Bộ phận</label>
+          <input type="text" id="mgr-dept" placeholder="Phòng Digital Marketing">
+        </div>
+        <div class="scale-box">
+          <div class="scale-title">📌 Thang điểm đánh giá</div>
+          <div class="scale-items">
+            <div class="scale-item"><div class="dot" style="background:#ef4444">1</div>Chưa bao giờ</div>
+            <div class="scale-item"><div class="dot" style="background:#f97316">2</div>Hiếm khi</div>
+            <div class="scale-item"><div class="dot" style="background:#eab308">3</div>Thỉnh thoảng</div>
+            <div class="scale-item"><div class="dot" style="background:#22c55e">4</div>Thường xuyên</div>
+            <div class="scale-item"><div class="dot" style="background:#3b82f6">5</div>Luôn luôn</div>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <button class="btn-next" id="startBtn" onclick="startSurvey()" style="background:linear-gradient(135deg,#1a56db,#7c3aed)">
+            Bắt đầu <span class="arrow">→</span>
+          </button>
+        </div>
+        <div class="warn-msg" id="info-warn" style="display:none">Vui lòng nhập họ và tên trước khi bắt đầu.</div>
+      </div>
+    </div>
+
+    <!-- ROLE STEPS: generated by JS -->
+    <div id="role-steps-container"></div>
+
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results-section"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+// ─── DATA ────────────────────────────────────────────────────
+const ROLES = [
+  { id:1, color:'#3b82f6', gradient:'linear-gradient(135deg,#3b82f6,#6366f1)',
+    title:'Kết nối chiến lược (CEO) và hành động (nhân viên)',
+    short:'Kết nối chiến lược',
+    questions:[
+      'Tôi hiểu rõ chiến lược và mục tiêu của CEO để truyền đạt rõ ràng đến nhân viên',
+      'Nhân viên của tôi hiểu rõ ý nghĩa công việc hằng ngày của họ trong việc đóng góp vào mục tiêu lớn',
+      'Tôi xác định rõ mục tiêu, chiến lược và kế hoạch hành động cho đội nhóm theo chu kỳ (quý/tháng/tuần)',
+      'Tôi kết nối mục tiêu nhóm với chiến lược công ty mỗi khi giao việc',
+      'Tôi truyền cảm hứng, thúc đẩy và giúp đội nhóm hiểu ý nghĩa lớn hơn của công việc họ làm',
+    ]},
+  { id:2, color:'#8b5cf6', gradient:'linear-gradient(135deg,#8b5cf6,#a855f7)',
+    title:'Chịu trách nhiệm hoàn toàn về mục tiêu chung của đội nhóm',
+    short:'Trách nhiệm mục tiêu',
+    questions:[
+      'Tôi chủ động xác định rõ những công việc quan trọng nhất, ưu tiên cao nhất trong đội nhóm của mình',
+      'Khi không đạt mục tiêu, tôi sẵn sàng nhận trách nhiệm và tìm giải pháp cải thiện thay vì đổ lỗi cho người khác',
+      'Tôi luôn giữ tinh thần "đội nhóm không đạt mục tiêu là lỗi của người lãnh đạo"',
+      'Tôi thường xuyên theo dõi tiến độ thực hiện mục tiêu của đội nhóm',
+      'Tôi có hành động cụ thể để hỗ trợ đội nhóm khi gặp khó khăn trong quá trình thực hiện mục tiêu',
+    ]},
+  { id:3, color:'#ec4899', gradient:'linear-gradient(135deg,#ec4899,#f43f5e)',
+    title:'Chịu trách nhiệm về hiệu suất nhân viên',
+    short:'Hiệu suất nhân viên',
+    questions:[
+      'Tôi dành thời gian để huấn luyện và giúp nhân viên tự tìm giải pháp thay vì làm thay họ',
+      'Tôi biết cách giao mục tiêu cụ thể, đo lường được và có thời hạn rõ ràng cho nhân viên',
+      'Tôi thường xuyên cung cấp phản hồi mang tính xây dựng để giúp nhân viên cải thiện hiệu suất',
+      'Tôi luôn ghi nhận và khen ngợi nhân viên khi họ đạt được kết quả tốt',
+      'Tôi xem kết quả công việc của nhân viên là phản ánh năng lực quản lý của chính mình',
+    ]},
+  { id:4, color:'#f59e0b', gradient:'linear-gradient(135deg,#f59e0b,#ef4444)',
+    title:'Xây dựng văn hóa làm việc tích cực, chủ động, hiệu suất cao',
+    short:'Văn hóa hiệu suất',
+    questions:[
+      'Đội nhóm của tôi thường xuyên thể hiện sự chủ động, sẵn sàng chịu trách nhiệm khi gặp vấn đề',
+      'Tôi nêu gương trong việc chủ động, có trách nhiệm và tích cực trong công việc',
+      'Tôi tạo môi trường an toàn để nhân viên dám chia sẻ ý kiến, phản hồi, kể cả phản biện với tôi',
+      'Tôi luôn công nhận và lan tỏa những hành vi tích cực trong đội nhóm',
+      'Tôi thảo luận với nhân viên về bài học rút ra sau mỗi dự án, kể cả khi thành công hay thất bại',
+    ]},
+  { id:5, color:'#10b981', gradient:'linear-gradient(135deg,#10b981,#06b6d4)',
+    title:'Xây dựng văn hóa đội nhóm phù hợp với văn hóa công ty',
+    short:'Văn hóa công ty',
+    questions:[
+      'Các giá trị, nguyên tắc làm việc trong đội nhóm của tôi rõ ràng và đồng bộ với giá trị chung của công ty',
+      'Tôi thường xuyên hành động nhất quán với các giá trị cốt lõi mà tôi kỳ vọng nhân viên tuân theo',
+      'Tôi truyền đạt rõ cho nhân viên về hành vi nào là phù hợp với văn hóa công ty',
+      'Tôi quan sát và phản hồi ngay khi có hành vi không phù hợp với văn hóa công ty',
+      'Tôi giúp nhân viên hiểu mối liên hệ giữa văn hóa công ty và sự phát triển bền vững của doanh nghiệp',
+    ]},
+  { id:6, color:'#06b6d4', gradient:'linear-gradient(135deg,#06b6d4,#3b82f6)',
+    title:'Kết nối hiệu quả với các phòng ban khác trong công ty',
+    short:'Phối hợp liên phòng',
+    questions:[
+      'Tôi đảm bảo đội nhóm của mình phối hợp hài hòa và hiệu quả với các phòng ban khác',
+      'Khi có mâu thuẫn với các phòng ban khác, tôi chủ động giải quyết để duy trì sự hợp tác tốt đẹp',
+      'Tôi có mối quan hệ làm việc tích cực và tôn trọng với các trưởng bộ phận khác',
+      'Tôi thường xuyên chia sẻ thông tin quan trọng với các phòng ban liên quan đúng thời điểm',
+      'Tôi góp phần tạo môi trường hợp tác tích cực giữa đội nhóm của tôi và các bộ phận khác',
+    ]},
+  { id:7, color:'#f97316', gradient:'linear-gradient(135deg,#f97316,#ef4444)',
+    title:'Là chính mình và làm gương cho nhân viên',
+    short:'Làm gương',
+    questions:[
+      'Tôi hành xử nhất quán giữa lời nói và hành động trong công việc',
+      'Tôi sẵn sàng nhận lỗi khi mình làm chưa tốt, thay vì đổ lỗi cho người khác',
+      'Tôi giữ bình tĩnh và tỉnh táo trong những tình huống căng thẳng để làm gương cho nhân viên',
+      'Tôi đối xử công bằng và nhất quán với tất cả thành viên trong đội nhóm',
+      'Tôi duy trì thái độ tích cực và chủ động dù gặp áp lực hoặc khó khăn',
+    ]},
+];
+
+const SUGGESTIONS = {
+  1: { title:'Kết nối Chiến lược', tips:[
+    'Tổ chức họp đầu tháng/quý để giải thích chiến lược CEO bằng ngôn ngữ thực tế cho đội',
+    'Trước khi giao việc, dành 2–3 phút giải thích "việc này quan trọng với mục tiêu lớn vì..."',
+    'Tạo bảng OKR nhóm hiển thị rõ: mục tiêu cá nhân → mục tiêu đội → mục tiêu công ty',
+  ]},
+  2: { title:'Trách nhiệm Mục tiêu', tips:[
+    'Check-in mục tiêu hằng tuần (15 phút): review tiến độ, xác định bottleneck ngay trong tuần',
+    'Khi KPI trễ, bắt đầu bằng câu hỏi: "Mình đã thiếu hỗ trợ ở đâu?" thay vì hỏi lý do',
+    'Dùng dashboard theo dõi mục tiêu real-time để cả đội cùng thấy tiến độ chung',
+  ]},
+  3: { title:'Hiệu suất Nhân viên', tips:[
+    'Áp dụng lịch 1-on-1 định kỳ 2 tuần/lần: 50% phản hồi, 50% coaching',
+    'Dùng framework GROW (Goal – Reality – Options – Will) khi nhân viên gặp khó khăn',
+    'Lập kế hoạch phát triển cá nhân (IDP) rõ ràng cho từng nhân viên mỗi quý',
+  ]},
+  4: { title:'Văn hóa Hiệu suất Cao', tips:[
+    'Tạo "Kudos Board" nội bộ – mỗi tuần công khai 1–2 hành vi tích cực đáng khen',
+    'Kết thúc dự án bằng Retrospective 30 phút: Làm tốt gì? Cần cải thiện gì?',
+    'Đặt quy tắc đội: ai cũng được nói "Tôi không đồng ý" – và giải thích lý do',
+  ]},
+  5: { title:'Sống Văn hóa Công ty', tips:[
+    'Mỗi tháng chọn 1 giá trị cốt lõi của SEONGON để cả đội thảo luận và ứng dụng thực tế',
+    'Khi khen hoặc phản hồi nhân viên, luôn kết nối với giá trị văn hóa cụ thể',
+    'Phản hồi ngay (trong ngày) khi quan sát hành vi lệch văn hóa – không để qua ngày hôm sau',
+  ]},
+  6: { title:'Phối hợp Liên phòng', tips:[
+    'Lên lịch gặp đầu tháng với 1–2 trưởng bộ phận liên quan: chia sẻ ưu tiên, xác định điểm phối hợp',
+    'Khi xung đột, tập trung vào mục tiêu chung thay vì bảo vệ lập trường của bộ phận mình',
+    'Tạo kênh Slack/email chung để các bộ phận cập nhật tiến độ dự án cross-team',
+  ]},
+  7: { title:'Làm gương & Tính Xác thực', tips:[
+    'Mỗi tuần chia sẻ 1 điều bạn đang học hoặc cải thiện – nhân viên sẽ noi gương',
+    'Thực hành "vulnerability leadership": dám nói "Tôi đã sai ở điểm này" trước đội nhóm',
+    'Tự đánh giá hàng tháng: hành động trong tháng có khớp với giá trị bạn rao giảng không?',
+  ]},
+};
+
+// ─── STATE ───────────────────────────────────────────────────
+const answers = {};  // "r{id}_q{i}" → 1-5
+let currentStep = 0; // 0 = info, 1..7 = role steps
+let globalQNum = 0;
+
+// ─── BUILD NAV DOTS ──────────────────────────────────────────
+function buildNav() {
+  const track = document.getElementById('stepTrack');
+  track.innerHTML = '';
+  ROLES.forEach((role, i) => {
+    if (i > 0) {
+      const line = document.createElement('div');
+      line.className = 'step-line'; line.id = `line-${role.id}`;
+      track.appendChild(line);
+    }
+    const wrap = document.createElement('div');
+    wrap.className = 'step-dot-wrap';
+    wrap.innerHTML = `
+      <div class="step-dot" id="dot-${role.id}">${role.id}</div>
+      <div class="step-label">${role.short}</div>
+    `;
+    track.appendChild(wrap);
+  });
+}
+
+// ─── BUILD ROLE STEPS ────────────────────────────────────────
+function buildSteps() {
+  const container = document.getElementById('role-steps-container');
+  container.innerHTML = '';
+  globalQNum = 0;
+  ROLES.forEach(role => {
+    const step = document.createElement('div');
+    step.className = 'role-step';
+    step.id = `step-${role.id}`;
+
+    const qCards = role.questions.map((q, i) => {
+      globalQNum++;
+      const key = `r${role.id}_q${i}`;
+      const gn = globalQNum;
+      return `
+        <div class="q-card" id="qc-${key}">
+          <div class="q-top">
+            <div class="q-num" style="background:${role.color}">${gn}</div>
+            <div class="q-text">${q}</div>
+          </div>
+          <div class="rating-row" id="rr-${key}">
+            ${[1,2,3,4,5].map(v=>`
+              <div class="rating-option">
+                <button class="rating-btn s${v}" id="rb-${key}-${v}" onclick="rate('${key}',${v},'${role.id}')">${v}</button>
+                <div class="rating-hint">${['Chưa<br>bao giờ','Hiếm<br>khi','Thỉnh<br>thoảng','Thường<br>xuyên','Luôn<br>luôn'][v-1]}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>`;
+    }).join('');
+
+    const isLast = role.id === 7;
+    step.innerHTML = `
+      <div class="role-hero slide-in" style="background:${role.gradient}">
+        <div class="role-hero-num">${role.id}</div>
+        <div class="role-hero-text">
+          <div class="role-hero-label">Vai trò ${role.id} / 7</div>
+          <div class="role-hero-title">${role.title}</div>
+          <div class="role-hero-count">${role.questions.length} câu hỏi</div>
+        </div>
+      </div>
+      <div class="role-progress">
+        <div class="role-prog-bar-bg"><div class="role-prog-bar-fill" id="rpf-${role.id}" style="background:${role.color};width:0%"></div></div>
+        <div class="role-prog-label" id="rpl-${role.id}">0 / ${role.questions.length}</div>
+      </div>
+      <div class="questions-stack">${qCards}</div>
+      <div id="warn-${role.id}" class="warn-msg" style="display:none">⚠️ Vui lòng trả lời đầy đủ tất cả ${role.questions.length} câu trước khi tiếp tục.</div>
+      <div class="step-actions">
+        <button class="btn-back" onclick="goStep(${role.id - 1}, 'back')">← Quay lại</button>
+        <button class="btn-next" id="btn-next-${role.id}" onclick="goNext(${role.id})" style="background:${role.gradient}">
+          ${isLast ? 'Xem kết quả 🎉' : 'Tiếp theo'} <span class="arrow">→</span>
+        </button>
+      </div>
+    `;
+    container.appendChild(step);
+  });
+}
+
+// ─── RATE ────────────────────────────────────────────────────
+function rate(key, val, roleId) {
+  const wasAnswered = answers[key] !== undefined;
+  answers[key] = val;
+  // Update button styles
+  const row = document.getElementById(`rr-${key}`);
+  row.querySelectorAll('.rating-btn').forEach(btn => {
+    const v = parseInt(btn.id.split('-').pop());
+    btn.className = `rating-btn s${v}${v === val ? ` sel-${val}` : ''}`;
+  });
+  const card = document.getElementById(`qc-${key}`);
+  card.classList.add('answered');
+  card.classList.remove('unanswered-warn');
+
+  // Update role progress bar
+  const rid = parseInt(roleId);
+  const role = ROLES.find(r => r.id === rid);
+  const done = role.questions.filter((_,i) => answers[`r${rid}_q${i}`] !== undefined).length;
+  const pct = (done / role.questions.length) * 100;
+  document.getElementById(`rpf-${rid}`).style.width = pct + '%';
+  document.getElementById(`rpl-${rid}`).textContent = `${done} / ${role.questions.length}`;
+
+  // Auto-scroll to next unanswered in this role
+  if (!wasAnswered) {
+    const nextUnanswered = role.questions.findIndex((_,i) => answers[`r${rid}_q${i}`] === undefined);
+    if (nextUnanswered !== -1) {
+      const el = document.getElementById(`qc-r${rid}_q${nextUnanswered}`);
+      if (el) setTimeout(() => el.scrollIntoView({ behavior:'smooth', block:'center' }), 200);
+    }
+  }
+}
+
+// ─── NAVIGATION ──────────────────────────────────────────────
+function startSurvey() {
+  const name = document.getElementById('mgr-name').value.trim();
+  if (!name) { document.getElementById('info-warn').style.display = 'block'; return; }
+  document.getElementById('info-warn').style.display = 'none';
+  goStep(1, 'next');
+}
+
+function goNext(roleId) {
+  const role = ROLES.find(r => r.id === roleId);
+  const missing = role.questions.filter((_,i) => answers[`r${roleId}_q${i}`] === undefined);
+  if (missing.length > 0) {
+    document.getElementById(`warn-${roleId}`).style.display = 'block';
+    // Highlight unanswered
+    role.questions.forEach((_,i) => {
+      const key = `r${roleId}_q${i}`;
+      if (answers[key] === undefined) document.getElementById(`qc-${key}`).classList.add('unanswered-warn');
+    });
+    // Scroll to first unanswered
+    const firstMissing = role.questions.findIndex((_,i) => answers[`r${roleId}_q${i}`] === undefined);
+    if (firstMissing !== -1) {
+      document.getElementById(`qc-r${roleId}_q${firstMissing}`).scrollIntoView({ behavior:'smooth', block:'center' });
+    }
+    return;
+  }
+  document.getElementById(`warn-${roleId}`).style.display = 'none';
+  if (roleId === 7) { showResults(); return; }
+  goStep(roleId + 1, 'next');
+}
+
+function goStep(stepId, dir) {
+  // Hide current
+  if (currentStep === 0) document.getElementById('step-0').style.display = 'none';
+  else { const el = document.getElementById(`step-${currentStep}`); if(el) { el.classList.remove('active'); el.style.display = 'none'; } }
+
+  currentStep = stepId;
+
+  if (stepId === 0) {
+    const s0 = document.getElementById('step-0');
+    s0.style.display = 'block';
+    const card = s0.querySelector('.info-card');
+    card.className = `info-card ${dir === 'back' ? 'slide-left' : 'slide-in'}`;
+    void card.offsetWidth; // reflow
+  } else {
+    const el = document.getElementById(`step-${stepId}`);
+    el.style.display = 'block';
+    el.classList.add('active');
+    const hero = el.querySelector('.role-hero');
+    hero.className = `role-hero ${dir === 'back' ? 'slide-left' : 'slide-in'}`;
+    void hero.offsetWidth;
+  }
+
+  updateNav();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateNav() {
+  ROLES.forEach(role => {
+    const dot = document.getElementById(`dot-${role.id}`);
+    const line = document.getElementById(`line-${role.id}`);
+    dot.className = 'step-dot';
+    if (role.id < currentStep) { dot.classList.add('done'); dot.textContent = '✓'; if(line) line.classList.add('done'); }
+    else if (role.id === currentStep) { dot.classList.add('active'); dot.textContent = role.id; if(line) line.classList.remove('done'); }
+    else { dot.textContent = role.id; if(line) line.classList.remove('done'); }
+  });
+}
+
+// ─── RESULTS ─────────────────────────────────────────────────
+function showResults() {
+  document.getElementById('form-section').style.display = 'none';
+
+  const name = document.getElementById('mgr-name').value.trim();
+  const dept = document.getElementById('mgr-dept').value.trim();
+
+  const roleScores = ROLES.map(role => {
+    let sum = 0;
+    role.questions.forEach((_,i) => { sum += answers[`r${role.id}_q${i}`] || 0; });
+    const avg = sum / role.questions.length;
+    return { roleId: role.id, sum, max: role.questions.length * 5, avg };
+  });
+
+  const totalSum = roleScores.reduce((a,b) => a + b.sum, 0);
+  const overallAvg = totalSum / 35;
+
+  function verdict(avg) {
+    if (avg >= 4.5) return { label:'Xuất sắc', cls:'v-xuatsac' };
+    if (avg >= 4.0) return { label:'Tốt', cls:'v-tot' };
+    if (avg >= 3.5) return { label:'Khá', cls:'v-kha' };
+    if (avg >= 2.5) return { label:'Trung bình', cls:'v-tb' };
+    return { label:'Cần cải thiện', cls:'v-yeu' };
+  }
+  const ov = verdict(overallAvg);
+
+  // All question scores for low-score list
+  const allQS = [];
+  ROLES.forEach(role => {
+    role.questions.forEach((q,i) => {
+      allQS.push({ role, q, score: answers[`r${role.id}_q${i}`] || 0 });
+    });
+  });
+  allQS.sort((a,b) => a.score - b.score);
+  const lowItems = allQS.filter(x => x.score <= 3).slice(0,8);
+
+  const strongRoles = roleScores.filter(rs => rs.avg >= 4.0).sort((a,b) => b.avg - a.avg);
+  const weakRoles = [...roleScores].sort((a,b) => a.avg - b.avg).slice(0,3);
+
+  const colorMap = {1:'#fee2e2',2:'#ffedd5',3:'#fef9c3'};
+  const textMap  = {1:'#dc2626',2:'#ea580c',3:'#ca8a04'};
+  const borderMap = {1:'#ef4444',2:'#f97316',3:'#eab308'};
+
+  const rs = document.getElementById('results-section');
+  rs.innerHTML = `
+    <div class="results-header fade-up">
+      <div class="mgr-line">${name}${dept ? ' · ' + dept : ''}</div>
+      <h2>Kết Quả Đánh Giá Vai Trò Leader</h2>
+      <div class="total-ring">
+        <div class="big">${totalSum}</div>
+        <div class="sub">/175</div>
+      </div>
+      <div><span class="verdict-chip">${ov.label} · TB ${overallAvg.toFixed(2)}/5</span></div>
+    </div>
+
+    <div class="analysis-card fade-up">
+      <h3><span class="icon" style="background:#eff6ff">📊</span>Điểm theo từng Vai trò</h3>
+      <div class="role-result-row">
+        ${roleScores.map((rs, idx) => {
+          const role = ROLES[idx];
+          const v = verdict(rs.avg);
+          const pct = (rs.sum / rs.max) * 100;
+          return `
+            <div class="rr-item">
+              <div class="rr-top">
+                <div class="rr-badge" style="background:${role.color}">${role.id}</div>
+                <div class="rr-name">${role.short}</div>
+                <div class="rr-score">${rs.avg.toFixed(2)}/5</div>
+                <span class="rr-verdict ${v.cls}">${v.label}</span>
+              </div>
+              <div class="rr-bar-bg">
+                <div class="rr-bar-fill" style="background:${role.color};width:0%" data-target="${pct}"></div>
+              </div>
+            </div>`;
+        }).join('')}
+      </div>
+      <div class="radar-wrap" style="margin-top:24px">
+        <canvas id="radarChart"></canvas>
+      </div>
+    </div>
+
+    ${strongRoles.length > 0 ? `
+    <div class="analysis-card fade-up">
+      <h3><span class="icon" style="background:#f0fdf4">💪</span>Điểm Mạnh Nổi Bật</h3>
+      <div class="strength-list">
+        ${strongRoles.map(rs => {
+          const role = ROLES.find(r => r.id === rs.roleId);
+          return `<div class="str-item">✅ <strong>Vai trò ${rs.roleId}: ${role.title}</strong> — TB ${rs.avg.toFixed(2)}/5. Tiếp tục duy trì và chia sẻ kinh nghiệm với đồng nghiệp.</div>`;
+        }).join('')}
+      </div>
+    </div>` : ''}
+
+    ${lowItems.length > 0 ? `
+    <div class="analysis-card fade-up">
+      <h3><span class="icon" style="background:#fff7ed">🎯</span>Câu hỏi Cần Cải Thiện (điểm thấp nhất)</h3>
+      <div class="low-list">
+        ${lowItems.map(x => `
+          <div class="low-item" style="border-left-color:${borderMap[x.score]||'#9ca3af'};background:${colorMap[x.score]||'#f9fafb'}">
+            <div class="lt">${x.q}</div>
+            <div class="lm">
+              <span>Vai trò ${x.role.id}: ${x.role.short}</span>
+              <span class="lscore" style="background:${colorMap[x.score]||'#f3f4f6'};color:${textMap[x.score]||'#374151'}">Điểm: ${x.score}/5</span>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>` : `<div class="analysis-card fade-up"><p style="color:#16a34a;font-size:15px;font-weight:600">🎉 Không có câu nào dưới 3 điểm – xuất sắc!</p></div>`}
+
+    <div class="analysis-card fade-up">
+      <h3><span class="icon" style="background:#f5f3ff">🚀</span>Gợi ý Phát Triển Cụ Thể</h3>
+      <div class="sug-list">
+        ${weakRoles.map((rs, idx) => {
+          const sug = SUGGESTIONS[rs.roleId];
+          const icons = ['🎯','📈','🔧'];
+          return `
+            <div class="sug-item">
+              <div class="sug-icon">${icons[idx]}</div>
+              <div>
+                <div class="sug-title">Vai trò ${rs.roleId}: ${sug.title} (TB: ${rs.avg.toFixed(2)}/5)</div>
+                <div class="sug-desc">${sug.tips.map((t,i)=>`<strong>${i+1}.</strong> ${t}`).join('<br>')}</div>
+              </div>
+            </div>`;
+        }).join('')}
+      </div>
+    </div>
+
+    <div class="action-row">
+      <button class="btn-outline" onclick="window.print()">🖨️ In / Lưu PDF</button>
+      <button class="btn-outline" onclick="copyResult()">📋 Sao chép kết quả</button>
+      <button class="btn-solid" onclick="location.reload()">↩ Làm lại từ đầu</button>
+    </div>
+  `;
+
+  rs.style.display = 'block';
+  window.scrollTo({ top:0, behavior:'smooth' });
+
+  // Animate bars
+  setTimeout(() => {
+    document.querySelectorAll('.rr-bar-fill[data-target]').forEach(el => {
+      el.style.width = el.dataset.target + '%';
+    });
+  }, 150);
+
+  // Radar chart
+  setTimeout(buildRadar.bind(null, roleScores), 300);
+}
+
+let radarChart = null;
+function buildRadar(roleScores) {
+  if (radarChart) { radarChart.destroy(); radarChart = null; }
+  const ctx = document.getElementById('radarChart');
+  if (!ctx) return;
+  radarChart = new Chart(ctx.getContext('2d'), {
+    type: 'radar',
+    data: {
+      labels: ROLES.map(r => `VT${r.id}`),
+      datasets: [{
+        label: 'Điểm TB/5',
+        data: roleScores.map(rs => parseFloat(rs.avg.toFixed(2))),
+        backgroundColor: 'rgba(26,86,219,.13)',
+        borderColor: '#1a56db',
+        borderWidth: 2.5,
+        pointBackgroundColor: ROLES.map(r => r.color),
+        pointRadius: 5, pointHoverRadius: 7,
+      }]
+    },
+    options: {
+      scales: { r: { beginAtZero:true, max:5, ticks:{ stepSize:1, font:{size:11} }, pointLabels:{ font:{size:12,weight:'bold'} }, grid:{ color:'rgba(0,0,0,.07)' } } },
+      plugins: { legend:{ display:false }, tooltip:{ callbacks:{ label: ctx => ` ${ROLES[ctx.dataIndex].title}: ${ctx.raw}/5` } } }
+    }
+  });
+}
+
+function copyResult() {
+  const name = document.querySelector('.mgr-line')?.textContent || '';
+  const verdict = document.querySelector('.verdict-chip')?.textContent || '';
+  let text = `KẾT QUẢ TỰ ĐÁNH GIÁ LEADER – SEONGON\n${name}\n${verdict}\n\n`;
+  document.querySelectorAll('.rr-item').forEach((item, i) => {
+    const score = item.querySelector('.rr-score')?.textContent || '';
+    const v = item.querySelector('.rr-verdict')?.textContent || '';
+    text += `Vai trò ${i+1}: ${ROLES[i].title} — ${score} (${v})\n`;
+  });
+  navigator.clipboard.writeText(text).then(() => alert('Đã sao chép!')).catch(() => alert('Vui lòng dùng In PDF.'));
+}
+
+// ─── INIT ────────────────────────────────────────────────────
+buildNav();
+buildSteps();
+updateNav();
+</script>
+</body>
+</html>
