@@ -432,10 +432,11 @@ function generateSlots(date) {
   let t = WORK_START;
   while (t + SLOT_DURATION <= WORK_END) {
     const h = Math.floor(t/60), m = t % 60;
-    const start = new Date(date);
-    start.setHours(h, m, 0, 0);
-    // toISOString() tự convert local → UTC, không cần trừ thêm 7h
-    slots.push({ label: `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`, iso: start.toISOString() });
+    // Tạo ISO với offset +07:00 tường minh — không phụ thuộc timezone browser
+    const dateStr = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+    const label = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+    const iso = `${dateStr}T${label}:00+07:00`;
+    slots.push({ label, iso });
     t += SLOT_DURATION + BUFFER;
   }
   return slots;
@@ -543,11 +544,11 @@ document.getElementById('booking-form').addEventListener('submit', async (e) => 
       document.getElementById('form-view').style.display = 'none';
       const ss = document.getElementById('success-screen');
       ss.style.display = 'block';
-      const vnStart = new Date(new Date(selectedSlot.iso).getTime() + 7 * 3600000);
+      // Dùng thẳng label (đã là giờ VN) + currentDate — không cần convert
       const days = ['Chủ Nhật','Thứ Hai','Thứ Ba','Thứ Tư','Thứ Năm','Thứ Sáu','Thứ Bảy'];
       document.getElementById('success-detail').innerHTML = `
         👤 <strong>${name}</strong>${company ? ` — ${company}` : ''}<br>
-        📅 <strong>${days[vnStart.getDay()]}, ${vnStart.getDate()}/${vnStart.getMonth()+1}/${vnStart.getFullYear()} lúc ${String(vnStart.getHours()).padStart(2,'0')}:${String(vnStart.getMinutes()).padStart(2,'0')}</strong><br>
+        📅 <strong>${days[currentDate.getDay()]}, ${currentDate.getDate()}/${currentDate.getMonth()+1}/${currentDate.getFullYear()} lúc ${selectedSlot.label}</strong><br>
         📝 ${topic}<br>
         📧 ${email}
       `;
