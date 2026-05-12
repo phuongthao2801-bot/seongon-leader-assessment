@@ -434,9 +434,8 @@ function generateSlots(date) {
     const h = Math.floor(t/60), m = t % 60;
     const start = new Date(date);
     start.setHours(h, m, 0, 0);
-    // Convert to UTC for ISO string (VN = UTC+7)
-    const utcStart = new Date(start.getTime() - 7 * 3600000);
-    slots.push({ label: `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`, iso: utcStart.toISOString() });
+    // toISOString() tự convert local → UTC, không cần trừ thêm 7h
+    slots.push({ label: `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`, iso: start.toISOString() });
     t += SLOT_DURATION + BUFFER;
   }
   return slots;
