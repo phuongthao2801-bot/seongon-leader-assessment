@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ra mắt GEO — Theo dõi tiến độ</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f4ff;min-height:100vh}
+.topbar{background:#004aef;padding:16px 24px;color:#fff;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.topbar h1{font-size:17px;font-weight:800}
+.topbar p{font-size:12px;opacity:.75;margin-top:2px}
+.btn{padding:9px 18px;border-radius:8px;border:none;cursor:pointer;font-size:14px;font-weight:700;display:inline-flex;align-items:center;gap:6px;text-decoration:none;transition:.2s}
+.btn-yellow{background:#ffce00;color:#000}
+.btn-yellow:hover{background:#f0c000}
+.btn-yellow:disabled{background:#ccc;cursor:not-allowed}
+.btn-white{background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3)}
+.btn-sm{padding:6px 14px;font-size:13px}
+
+/* Login */
+.login-wrap{display:flex;align-items:center;justify-content:center;min-height:80vh}
+.login-box{background:#fff;border-radius:16px;padding:40px;width:340px;box-shadow:0 4px 20px rgba(0,74,239,.1)}
+.login-box h2{font-size:20px;font-weight:800;color:#004aef;margin-bottom:6px}
+.login-box p{font-size:13px;color:#888;margin-bottom:24px}
+.login-box input{width:100%;padding:11px 14px;border:1.5px solid #dde3f5;border-radius:8px;font-size:15px;outline:none;margin-bottom:14px}
+.login-box input:focus{border-color:#004aef}
+.login-box button{width:100%}
+.login-err{color:#e53e3e;font-size:13px;margin-top:8px;display:none}
+
+/* Countdown */
+.countdown-bar{background:#fff;border-radius:12px;padding:16px 24px;margin:20px 24px 0;display:flex;align-items:center;gap:24px;box-shadow:0 2px 8px rgba(0,74,239,.08);flex-wrap:wrap}
+.cd-num{font-size:36px;font-weight:900;color:#004aef;line-height:1}
+.cd-label{font-size:12px;color:#888;margin-top:2px}
+.cd-block{text-align:center}
+.cd-sep{font-size:24px;color:#dde3f5;font-weight:300;align-self:flex-start;padding-top:4px}
+.cd-project{flex:1;min-width:200px}
+.cd-project h2{font-size:16px;font-weight:800;color:#111}
+.cd-project p{font-size:13px;color:#888;margin-top:2px}
+.progress-outer{background:#f0f4ff;border-radius:20px;height:8px;margin-top:8px;overflow:hidden}
+.progress-inner{height:100%;background:linear-gradient(90deg,#004aef,#0dd1ff);border-radius:20px;transition:.5s}
+
+/* Stats */
+.stats{display:flex;gap:12px;margin:16px 24px 0;flex-wrap:wrap}
+.stat-card{background:#fff;border-radius:10px;padding:14px 18px;flex:1;min-width:110px;box-shadow:0 2px 8px rgba(0,74,239,.06)}
+.stat-num{font-size:26px;font-weight:900;color:#004aef}
+.stat-label{font-size:12px;color:#888;margin-top:2px}
+.stat-card.green .stat-num{color:#38a169}
+.stat-card.orange .stat-num{color:#dd6b20}
+.stat-card.gray .stat-num{color:#718096}
+.stat-card.red .stat-num{color:#e53e3e}
+
+/* Summary */
+.summary-box{background:#fff;border-radius:12px;padding:20px 24px;margin:16px 24px 0;box-shadow:0 2px 8px rgba(0,74,239,.06)}
+.summary-box h3{font-size:14px;font-weight:700;color:#004aef;margin-bottom:10px}
+.summary-text{font-size:14px;color:#333;line-height:1.8;white-space:pre-line}
+.summary-meta{font-size:12px;color:#aaa;margin-top:8px}
+
+/* Views */
+.view-tabs{display:flex;gap:8px;margin:20px 24px 0}
+.tab{padding:8px 18px;border-radius:8px;border:1.5px solid #dde3f5;background:#fff;font-size:14px;font-weight:600;cursor:pointer;color:#555}
+.tab.active{background:#004aef;color:#fff;border-color:#004aef}
+
+/* Kanban */
+.kanban{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:16px 24px 24px;display:none}
+.kanban.show{display:grid}
+.k-col{background:#fff;border-radius:12px;padding:14px;box-shadow:0 2px 8px rgba(0,74,239,.06)}
+.k-col-title{font-size:13px;font-weight:700;padding:4px 10px;border-radius:20px;display:inline-flex;align-items:center;gap:6px;margin-bottom:12px}
+.k-card{background:#f8faff;border-radius:8px;padding:10px 12px;margin-bottom:8px;border-left:3px solid #004aef;font-size:13px}
+.k-card .kr{font-weight:600;color:#111;margin-bottom:4px}
+.k-card .meta{font-size:11px;color:#888;display:flex;gap:8px;flex-wrap:wrap}
+.k-card .hm{font-size:11px;background:#e8f0fe;color:#004aef;border-radius:4px;padding:1px 6px;font-weight:600}
+.k-empty{color:#ccc;font-size:13px;text-align:center;padding:16px 0}
+
+/* Timeline view */
+.timeline{margin:16px 24px 24px;display:none}
+.timeline.show{display:block}
+.tl-row{background:#fff;border-radius:10px;padding:14px 18px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,74,239,.06);display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap}
+.tl-num{font-size:20px;font-weight:900;color:#dde3f5;min-width:28px}
+.tl-body{flex:1}
+.tl-kr{font-size:14px;font-weight:600;color:#111;margin-bottom:4px}
+.tl-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.badge{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:700}
+.badge-hoanhthanh{background:#c6f6d5;color:#276749}
+.badge-trienkhai{background:#bee3f8;color:#2c5282}
+.badge-chuabatdau{background:#fed7d7;color:#9b2c2c}
+.badge-huy{background:#e2e8f0;color:#718096}
+.badge-default{background:#e8f0fe;color:#004aef}
+.tl-owner{font-size:12px;color:#888}
+.tl-progress{font-size:12px;color:#dd6b20;font-weight:500}
+
+/* Loading */
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(0,0,0,.1);border-top-color:#004aef;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Toast */
+.toast{position:fixed;bottom:20px;right:20px;background:#004aef;color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:600;z-index:999;display:none;box-shadow:0 4px 16px rgba(0,74,239,.3)}
+
+@media(max-width:600px){.countdown-bar{margin:12px;}.stats{margin:12px}.summary-box,.kanban,.timeline{margin:12px 12px 12px}.view-tabs{margin:12px}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <h1>🚀 Ra mắt GEO — Theo dõi tiến độ</h1>
+    <p id="last-fetch">Đang tải...</p>
+  </div>
+  <div style="display:flex;gap:8px">
+    <button class="btn btn-yellow" id="btn-report" onclick="fetchReport()">⚡ Lấy báo cáo mới</button>
+    <button class="btn btn-white btn-sm" onclick="logout()">Đăng xuất</button>
+  </div>
+</div>
+
+<!-- Login screen -->
+<div class="login-wrap" id="login-screen">
+  <div class="login-box">
+    <h2>🔐 Đăng nhập</h2>
+    <p>Dashboard theo dõi dự án Ra mắt GEO</p>
+    <input type="password" id="pass-input" placeholder="Mật khẩu..." onkeydown="if(event.key==='Enter')login()">
+    <button class="btn btn-yellow" style="width:100%" onclick="login()">Vào dashboard</button>
+    <div class="login-err" id="login-err">Sai mật khẩu. Thử lại.</div>
+  </div>
+</div>
+
+<!-- Dashboard -->
+<div id="dashboard" style="display:none">
+
+  <div class="countdown-bar">
+    <div class="cd-project">
+      <h2 id="proj-name">Ra mắt GEO</h2>
+      <p id="proj-date">Ngày ra mắt: 27/05/2026</p>
+      <div class="progress-outer"><div class="progress-inner" id="prog-bar" style="width:0%"></div></div>
+      <p style="font-size:12px;color:#888;margin-top:4px" id="prog-label">0/0 đầu việc hoàn thành</p>
+    </div>
+    <div style="display:flex;gap:12px;align-items:center">
+      <div class="cd-block"><div class="cd-num" id="cd-days">--</div><div class="cd-label">ngày</div></div>
+      <div class="cd-sep">:</div>
+      <div class="cd-block"><div class="cd-num" id="cd-hours">--</div><div class="cd-label">giờ</div></div>
+      <div class="cd-sep">:</div>
+      <div class="cd-block"><div class="cd-num" id="cd-mins">--</div><div class="cd-label">phút</div></div>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat-card green"><div class="stat-num" id="s-done">0</div><div class="stat-label">✅ Hoàn thành</div></div>
+    <div class="stat-card orange"><div class="stat-num" id="s-prog">0</div><div class="stat-label">🔄 Triển khai</div></div>
+    <div class="stat-card"><div class="stat-num" id="s-new">0</div><div class="stat-label">⏳ Chưa bắt đầu</div></div>
+    <div class="stat-card gray"><div class="stat-num" id="s-cancel">0</div><div class="stat-label">🚫 Hủy</div></div>
+    <div class="stat-card"><div class="stat-num" id="s-total">0</div><div class="stat-label">📋 Tổng</div></div>
+  </div>
+
+  <div class="summary-box" id="summary-box" style="display:none">
+    <h3>🤖 Tóm tắt AI (Llama 3.3)</h3>
+    <div class="summary-text" id="summary-text"></div>
+    <div class="summary-meta" id="summary-meta"></div>
+  </div>
+
+  <div class="view-tabs">
+    <button class="tab active" onclick="switchTab('kanban')">📋 Kanban</button>
+    <button class="tab" onclick="switchTab('timeline')">📝 Danh sách</button>
+  </div>
+
+  <!-- Kanban -->
+  <div class="kanban show" id="kanban-view"></div>
+
+  <!-- Timeline -->
+  <div class="timeline" id="timeline-view"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let PASS = '';
+let tasks = [];
+const LAUNCH = new Date('2026-05-27T09:00:00+07:00');
+
+const STATUS_BADGE = {
+  'Hoàn thành': 'badge-hoanhthanh',
+  'Triển khai': 'badge-trienkhai',
+  'Đang làm': 'badge-trienkhai',
+  'Chưa bắt đầu': 'badge-chuabatdau',
+  'Hủy': 'badge-huy',
+};
+
+function showToast(msg, color='#004aef') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = color;
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 4000);
+}
+
+function logout() {
+  PASS = '';
+  sessionStorage.removeItem('du_an_pass');
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+}
+
+async function login() {
+  const p = document.getElementById('pass-input').value;
+  const r = await fetch('/api/du-an', { headers: { 'X-Admin-Pass': p } });
+  if (r.status === 401) {
+    document.getElementById('login-err').style.display = 'block';
+    return;
+  }
+  PASS = p;
+  sessionStorage.setItem('du_an_pass', p);
+  document.getElementById('login-err').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  const d = await r.json();
+  renderDashboard(d);
+}
+
+async function fetchReport() {
+  const btn = document.getElementById('btn-report');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Đang lấy...';
+  try {
+    const r = await fetch('/api/du-an', { method: 'POST', headers: { 'X-Admin-Pass': PASS } });
+    const d = await r.json();
+    if (d.success) {
+      showToast('✅ Báo cáo mới đã gửi Telegram!');
+      // Refresh data
+      const r2 = await fetch('/api/du-an', { headers: { 'X-Admin-Pass': PASS } });
+      const d2 = await r2.json();
+      renderDashboard(d2);
+      if (d.summary) {
+        document.getElementById('summary-text').textContent = d.summary;
+        document.getElementById('summary-meta').textContent = 'Cập nhật: ' + new Date().toLocaleString('vi-VN');
+        document.getElementById('summary-box').style.display = 'block';
+      }
+    } else {
+      showToast('❌ ' + (d.error || 'Lỗi'), '#e53e3e');
+    }
+  } catch(e) {
+    showToast('❌ Mất kết nối', '#e53e3e');
+  }
+  btn.disabled = false;
+  btn.innerHTML = '⚡ Lấy báo cáo mới';
+}
+
+function renderDashboard(d) {
+  tasks = d.tasks || [];
+  const proj = d.project || {};
+  const lastFetch = proj.last_fetched_at ? new Date(proj.last_fetched_at).toLocaleString('vi-VN', {timeZone:'Asia/Ho_Chi_Minh'}) : 'Chưa lấy báo cáo';
+  document.getElementById('last-fetch').textContent = 'Cập nhật lần cuối: ' + lastFetch;
+
+  // Stats
+  const done = tasks.filter(t => t['Tình trạng'] === 'Hoàn thành').length;
+  const prog = tasks.filter(t => ['Triển khai','Đang làm'].includes(t['Tình trạng'])).length;
+  const newt = tasks.filter(t => t['Tình trạng'] === 'Chưa bắt đầu').length;
+  const cancel = tasks.filter(t => t['Tình trạng'] === 'Hủy').length;
+  const total = tasks.length;
+  const pct = total ? Math.round(done/total*100) : 0;
+
+  document.getElementById('s-done').textContent = done;
+  document.getElementById('s-prog').textContent = prog;
+  document.getElementById('s-new').textContent = newt;
+  document.getElementById('s-cancel').textContent = cancel;
+  document.getElementById('s-total').textContent = total;
+  document.getElementById('prog-bar').style.width = pct + '%';
+  document.getElementById('prog-label').textContent = done + '/' + total + ' đầu việc hoàn thành (' + pct + '%)';
+
+  // Last report summary
+  const reports = d.reports || [];
+  if (reports.length && reports[0].summary) {
+    document.getElementById('summary-text').textContent = reports[0].summary;
+    document.getElementById('summary-meta').textContent = 'Cập nhật: ' + new Date(reports[0].fetched_at).toLocaleString('vi-VN', {timeZone:'Asia/Ho_Chi_Minh'});
+    document.getElementById('summary-box').style.display = 'block';
+  }
+
+  renderKanban(tasks);
+  renderTimeline(tasks);
+}
+
+function getBadge(status) {
+  const cls = STATUS_BADGE[status] || 'badge-default';
+  return `<span class="badge ${cls}">${status}</span>`;
+}
+
+function renderKanban(tasks) {
+  const cols = ['Chưa bắt đầu', 'Triển khai', 'Hoàn thành', 'Hủy'];
+  const colColors = {'Chưa bắt đầu':'#fed7d7', 'Triển khai':'#bee3f8', 'Hoàn thành':'#c6f6d5', 'Hủy':'#e2e8f0'};
+  const colTextColors = {'Chưa bắt đầu':'#9b2c2c', 'Triển khai':'#2c5282', 'Hoàn thành':'#276749', 'Hủy':'#718096'};
+  const colIcons = {'Chưa bắt đầu':'⏳','Triển khai':'🔄','Hoàn thành':'✅','Hủy':'🚫'};
+
+  let html = '';
+  for (const col of cols) {
+    const items = tasks.filter(t => t['Tình trạng'] === col || (col === 'Triển khai' && t['Tình trạng'] === 'Đang làm'));
+    html += `<div class="k-col">
+      <div class="k-col-title" style="background:${colColors[col]};color:${colTextColors[col]}">${colIcons[col]} ${col} <span style="opacity:.6">(${items.length})</span></div>`;
+    if (!items.length) {
+      html += '<div class="k-empty">Không có</div>';
+    } else {
+      items.forEach(t => {
+        html += `<div class="k-card">
+          <div class="kr">${t['KR'] || '—'}</div>
+          <div class="meta">
+            <span class="hm">${t['Hạng mục'] || ''}</span>
+            ${t['Phụ trách'] ? `<span>${t['Phụ trách']}</span>` : ''}
+            ${t['Tiến độ'] ? `<span style="color:#dd6b20">${t['Tiến độ']}</span>` : ''}
+          </div>
+        </div>`;
+      });
+    }
+    html += '</div>';
+  }
+  document.getElementById('kanban-view').innerHTML = html;
+}
+
+function renderTimeline(tasks) {
+  const html = tasks.map(t => {
+    const badge = getBadge(t['Tình trạng']);
+    return `<div class="tl-row">
+      <div class="tl-num">${t['TT'] || ''}</div>
+      <div class="tl-body">
+        <div class="tl-kr">${t['KR'] || '—'}</div>
+        <div class="tl-meta">
+          ${badge}
+          <span class="badge badge-default">${t['Hạng mục'] || ''}</span>
+          ${t['Phụ trách'] ? `<span class="tl-owner">👤 ${t['Phụ trách']}</span>` : ''}
+          ${t['Tiến độ'] ? `<span class="tl-progress">📌 ${t['Tiến độ']}</span>` : ''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('timeline-view').innerHTML = html;
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('kanban-view').classList.toggle('show', tab === 'kanban');
+  document.getElementById('timeline-view').classList.toggle('show', tab === 'timeline');
+}
+
+// Countdown
+function updateCountdown() {
+  const now = new Date();
+  const diff = LAUNCH - now;
+  if (diff <= 0) {
+    document.getElementById('cd-days').textContent = '0';
+    document.getElementById('cd-hours').textContent = '00';
+    document.getElementById('cd-mins').textContent = '00';
+    return;
+  }
+  const days = Math.floor(diff / 86400000);
+  const hours = Math.floor((diff % 86400000) / 3600000);
+  const mins = Math.floor((diff % 3600000) / 60000);
+  document.getElementById('cd-days').textContent = days;
+  document.getElementById('cd-hours').textContent = String(hours).padStart(2, '0');
+  document.getElementById('cd-mins').textContent = String(mins).padStart(2, '0');
+}
+updateCountdown();
+setInterval(updateCountdown, 60000);
+
+// Auto-login if session saved
+const savedPass = sessionStorage.getItem('du_an_pass');
+if (savedPass) {
+  document.getElementById('pass-input').value = savedPass;
+  login();
+}
+</script>
+</body>
+</html>

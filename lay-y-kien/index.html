@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lấy ý kiến kế hoạch — SEONGON</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f4ff;min-height:100vh;padding:24px 16px}
+  .wrap{max-width:680px;margin:0 auto}
+  .header{background:#004aef;border-radius:16px;padding:28px 32px;margin-bottom:24px;color:#fff}
+  .header h1{font-size:22px;font-weight:800;margin-bottom:4px}
+  .header p{font-size:14px;opacity:.8}
+  .card{background:#fff;border-radius:14px;padding:28px;box-shadow:0 2px 12px rgba(0,74,239,.08);margin-bottom:18px}
+  .card h2{font-size:16px;font-weight:700;color:#004aef;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+  label{display:block;font-size:13px;font-weight:600;color:#333;margin-bottom:6px}
+  input,textarea{width:100%;padding:10px 14px;border:1.5px solid #dde3f5;border-radius:8px;font-size:14px;font-family:inherit;outline:none;transition:.2s}
+  input:focus,textarea:focus{border-color:#004aef;box-shadow:0 0 0 3px rgba(0,74,239,.1)}
+  textarea{resize:vertical;min-height:140px}
+  .field{margin-bottom:16px}
+  .nv-row{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end;margin-bottom:10px}
+  .nv-row input{margin:0}
+  .btn-remove{background:none;border:none;cursor:pointer;font-size:18px;color:#ccc;padding:10px 4px;line-height:1}
+  .btn-remove:hover{color:#e33}
+  .btn-add{background:none;border:1.5px dashed #004aef;color:#004aef;padding:9px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;width:100%;margin-top:4px}
+  .btn-add:hover{background:#f0f4ff}
+  .btn-submit{width:100%;padding:15px;background:#004aef;color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;margin-top:8px;transition:.2s}
+  .btn-submit:hover{background:#0036c0}
+  .btn-submit:disabled{background:#aaa;cursor:not-allowed}
+  .note{background:#fff8e1;border-left:3px solid #ffce00;padding:10px 14px;border-radius:6px;font-size:13px;color:#7a6000;margin-bottom:20px}
+  .success{display:none;text-align:center;padding:40px 20px}
+  .success .icon{font-size:52px;margin-bottom:16px}
+  .success h2{font-size:20px;color:#004aef;font-weight:700;margin-bottom:10px}
+  .success p{color:#555;line-height:1.7;font-size:15px}
+  .tag{display:inline-block;background:#e8f0fe;color:#004aef;border-radius:20px;padding:2px 10px;font-size:12px;font-weight:600;margin:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <h1>🎯 Lấy ý kiến kế hoạch kinh doanh</h1>
+    <p>AI Agent sẽ phỏng vấn từng người — Sếp không cần họp 2 tiếng</p>
+  </div>
+
+  <div id="form-section">
+    <div class="note">
+      💡 Điền kế hoạch + danh sách người cần hỏi → Hệ thống tự gửi link riêng cho từng người → AI phỏng vấn họ → Sếp nhận tổng hợp qua Telegram khi đủ người trả lời.
+    </div>
+
+    <div class="card">
+      <h2>📋 Thông tin kế hoạch</h2>
+      <div class="field">
+        <label>Tên kế hoạch</label>
+        <input type="text" id="title" value="Kế hoạch ra mắt GEO Q3/2026" placeholder="VD: Kế hoạch ra mắt GEO Q3/2026">
+      </div>
+      <div class="field">
+        <label>Nội dung kế hoạch <span style="color:#888;font-weight:400">(paste toàn bộ hoặc tóm tắt chính — AI sẽ dùng để phỏng vấn)</span></label>
+        <textarea id="plan" placeholder="Paste nội dung kế hoạch vào đây...&#10;&#10;VD: SEONGON dự kiến ra mắt dịch vụ GEO (Generative Engine Optimization) trong Q3/2026. Đây là dịch vụ tối ưu hóa nội dung để xuất hiện trong kết quả AI như ChatGPT, Gemini, Perplexity...&#10;&#10;Mục tiêu: 20 khách hàng đầu tiên trong 3 tháng..."></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>👥 Danh sách người được hỏi</h2>
+      <div id="nv-list">
+        <div class="nv-row">
+          <div><label>Họ tên</label><input type="text" placeholder="VD: Nguyễn Văn An" class="nv-name"></div>
+          <div><label>Email</label><input type="email" placeholder="an@seongon.com" class="nv-email"></div>
+          <button class="btn-remove" onclick="removeRow(this)" title="Xóa">✕</button>
+        </div>
+      </div>
+      <button class="btn-add" onclick="addRow()">+ Thêm người</button>
+    </div>
+
+    <button class="btn-submit" id="submit-btn" onclick="submitCampaign()">
+      🚀 Gửi link phỏng vấn cho tất cả
+    </button>
+  </div>
+
+  <div class="success" id="success-section">
+    <div class="icon">✅</div>
+    <h2>Đã gửi link phỏng vấn!</h2>
+    <p id="success-msg"></p>
+    <p style="margin-top:16px;color:#888;font-size:13px">Sếp sẽ nhận Telegram khi đủ người trả lời.</p>
+  </div>
+</div>
+
+<script>
+function addRow() {
+  const div = document.createElement('div');
+  div.className = 'nv-row';
+  div.innerHTML = `
+    <div><label>Họ tên</label><input type="text" placeholder="Nguyễn Văn An" class="nv-name"></div>
+    <div><label>Email</label><input type="email" placeholder="email@seongon.com" class="nv-email"></div>
+    <button class="btn-remove" onclick="removeRow(this)" title="Xóa">✕</button>`;
+  document.getElementById('nv-list').appendChild(div);
+}
+
+function removeRow(btn) {
+  const rows = document.querySelectorAll('.nv-row');
+  if (rows.length <= 1) return;
+  btn.closest('.nv-row').remove();
+}
+
+async function submitCampaign() {
+  const title = document.getElementById('title').value.trim();
+  const plan = document.getElementById('plan').value.trim();
+  if (!title || !plan) { alert('Sếp chưa điền tên kế hoạch hoặc nội dung.'); return; }
+
+  const employees = [];
+  document.querySelectorAll('.nv-row').forEach(row => {
+    const name = row.querySelector('.nv-name').value.trim();
+    const email = row.querySelector('.nv-email').value.trim();
+    if (name && email) employees.push({name, email});
+  });
+  if (employees.length === 0) { alert('Sếp chưa thêm người nào.'); return; }
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Đang gửi...';
+
+  try {
+    const res = await fetch('/api/lay-y-kien', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({title, plan_content: plan, employees})
+    });
+    const r = await res.json();
+    if (r.success) {
+      document.getElementById('form-section').style.display = 'none';
+      const s = document.getElementById('success-section');
+      s.style.display = 'block';
+      document.getElementById('success-msg').innerHTML =
+        `Đã gửi link đến <strong>${employees.length} người</strong>:<br>${employees.map(e=>`<span class="tag">✉️ ${e.name}</span>`).join('')}`;
+    } else {
+      alert('Lỗi: ' + (r.error || 'Thử lại nhé.'));
+      btn.disabled = false;
+      btn.textContent = '🚀 Gửi link phỏng vấn cho tất cả';
+    }
+  } catch(e) {
+    alert('Mất kết nối. Thử lại nhé.');
+    btn.disabled = false;
+    btn.textContent = '🚀 Gửi link phỏng vấn cho tất cả';
+  }
+}
+</script>
+</body>
+</html>

@@ -1,6 +1,10 @@
 name = "thaoseongon"
-compatibility_date = "2025-04-01"
 pages_build_output_dir = "."
+compatibility_date = "2025-04-01"
+
+[[kv_namespaces]]
+binding = "RATE_LIMIT_KV"
+id = "f1e358ba31d2482ba7d3d06121277c92"
 
 [[d1_databases]]
 binding = "BOOKING_DB"
@@ -16,3 +20,16 @@ database_id = "fb7b69b2-b529-463b-afba-fbf37f8c1c3a"
 binding = "CHI_PHI_DB"
 database_name = "abs-duyet-chi"
 database_id = "c6ff508b-0fc1-4ded-b301-fe4955417c9e"
+
+[[d1_databases]]
+binding = "LYK_DB"
+database_name = "abs-lay-y-kien"
+database_id = "a06f41ca-d80a-45d7-acf8-f84a623bfe1a"
+
+[[d1_databases]]
+binding = "DU_AN_DB"
+database_name = "abs-du-an"
+database_id = "3bcf9cec-4d17-4a7c-945e-f2da33cb19ef"
+
+[ai]
+binding = "AI"

@@ -4,6 +4,15 @@ interface Env {
   TELEGRAM_CHAT_ID: string;
   RESEND_API_KEY: string;
   ABS_MA_BAI: string;
+  RATE_LIMIT_KV: KVNamespace;
+}
+
+async function checkRateLimit(kv: KVNamespace, ip: string, endpoint: string, max = 10, windowSec = 600): Promise<boolean> {
+  const key = `rl:${endpoint}:${ip}`;
+  const current = parseInt(await kv.get(key) || '0', 10);
+  if (current >= max) return false;
+  await kv.put(key, String(current + 1), { expirationTtl: windowSec });
+  return true;
 }
 
 async function logABS(maBai: string, buoc: string, payload?: object) {
@@ -45,6 +54,11 @@ export const onRequest: PagesFunction<Env> = async (context) => {
   }
 
   if (context.request.method !== 'POST') return json({ error: 'Method not allowed' }, 405);
+
+  // Rate limit: 10 lần / 10 phút / IP
+  const ip = context.request.headers.get('CF-Connecting-IP') || 'unknown';
+  const allowed = await checkRateLimit(context.env.RATE_LIMIT_KV, ip, 'chi-phi');
+  if (!allowed) return json({ error: 'Bạn gửi quá nhiều yêu cầu. Vui lòng thử lại sau 10 phút.' }, 429);
 
   try {
     const body = await context.request.json() as any;

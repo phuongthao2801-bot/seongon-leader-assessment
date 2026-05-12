@@ -3,6 +3,15 @@ interface Env {
   RESEND_API_KEY: string;
   TELEGRAM_BOT_TOKEN: string;
   TELEGRAM_CHAT_ID: string;
+  RATE_LIMIT_KV: KVNamespace;
+}
+
+async function checkRateLimit(kv: KVNamespace, ip: string, endpoint: string, max = 10, windowSec = 600): Promise<boolean> {
+  const key = `rl:${endpoint}:${ip}`;
+  const current = parseInt(await kv.get(key) || '0', 10);
+  if (current >= max) return false;
+  await kv.put(key, String(current + 1), { expirationTtl: windowSec });
+  return true;
 }
 
 const WORK_START = 8 * 60 + 30; // 8:30
@@ -68,6 +77,11 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     'Access-Control-Allow-Origin': '*',
     'Content-Type': 'application/json'
   };
+
+  // Rate limit: 10 lần / 10 phút / IP
+  const ip = context.request.headers.get('CF-Connecting-IP') || 'unknown';
+  const allowed = await checkRateLimit(context.env.RATE_LIMIT_KV, ip, 'booking');
+  if (!allowed) return new Response(JSON.stringify({ error: 'Bạn gửi quá nhiều yêu cầu. Vui lòng thử lại sau 10 phút.' }), { status: 429, headers: corsHeaders });
 
   try {
     const body = await context.request.json() as any;

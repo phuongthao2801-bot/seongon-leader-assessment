@@ -1,6 +1,15 @@
 interface Env {
   KH_DB: D1Database;
   RESEND_API_KEY: string;
+  RATE_LIMIT_KV: KVNamespace;
+}
+
+async function checkRateLimit(kv: KVNamespace, ip: string, endpoint: string, max = 10, windowSec = 600): Promise<boolean> {
+  const key = `rl:${endpoint}:${ip}`;
+  const current = parseInt(await kv.get(key) || '0', 10);
+  if (current >= max) return false;
+  await kv.put(key, String(current + 1), { expirationTtl: windowSec });
+  return true;
 }
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
@@ -10,6 +19,16 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     'Access-Control-Allow-Headers': 'Content-Type',
     'Content-Type': 'application/json'
   };
+
+  // Rate limit: 10 lần / 10 phút / IP
+  const ip = context.request.headers.get('CF-Connecting-IP') || 'unknown';
+  const allowed = await checkRateLimit(context.env.RATE_LIMIT_KV, ip, 'register');
+  if (!allowed) {
+    if (context.request.headers.get('content-type')?.includes('application/x-www-form-urlencoded')) {
+      return new Response(null, { status: 302, headers: { ...headers, 'Location': '/dang-ky/?error=rate_limit' } });
+    }
+    return new Response(JSON.stringify({ error: 'Bạn gửi quá nhiều yêu cầu. Vui lòng thử lại sau 10 phút.' }), { status: 429, headers });
+  }
 
   try {
     const contentType = context.request.headers.get('content-type') || '';

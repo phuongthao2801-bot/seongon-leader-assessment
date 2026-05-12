@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SEONGON CRM</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{font-family:'Inter',sans-serif}
+:root{--cyan:#0dd1ff}
+body{background:#030712;color:#f1f5f9}
+.sidebar{width:240px;min-width:240px;background:#0f172a;border-right:1px solid #1e293b}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:8px;cursor:pointer;color:#94a3b8;font-size:14px;font-weight:500;transition:all .15s}
+.nav-item:hover{background:#1e293b;color:#f1f5f9}
+.nav-item.active{background:#0dd1ff20;color:#0dd1ff}
+.card{background:#0f172a;border:1px solid #1e293b;border-radius:12px}
+.btn{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;border:none;outline:none}
+.btn-primary{background:#0dd1ff;color:#000}
+.btn-primary:hover{background:#00b8e6}
+.btn-ghost{background:transparent;color:#94a3b8;border:1px solid #1e293b}
+.btn-ghost:hover{background:#1e293b;color:#f1f5f9}
+.btn-danger{background:#ef444420;color:#ef4444;border:1px solid #ef444440}
+.btn-danger:hover{background:#ef4444;color:#fff}
+input,select,textarea{background:#1e293b;border:1px solid #334155;border-radius:8px;padding:8px 12px;color:#f1f5f9;font-size:14px;width:100%;outline:none;transition:border .15s}
+input:focus,select:focus,textarea:focus{border-color:#0dd1ff}
+select option{background:#1e293b}
+.badge{display:inline-flex;align-items:center;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.kanban-col{min-height:400px;border-radius:12px;padding:12px;border:2px solid transparent;transition:all .2s}
+.kanban-col.drag-over{border-color:#0dd1ff;background:#0dd1ff08}
+.lead-card{background:#0f172a;border:1px solid #1e293b;border-radius:10px;padding:14px;margin-bottom:10px;cursor:grab;transition:all .2s;position:relative}
+.lead-card:hover{border-color:#334155;transform:translateY(-1px);box-shadow:0 4px 20px #0004}
+.lead-card.dragging{opacity:.4;transform:scale(.97)}
+.modal-overlay{position:fixed;inset:0;background:#00000088;z-index:100;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal{background:#0f172a;border:1px solid #1e293b;border-radius:16px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 25px 60px #0008}
+.modal-sm{max-width:480px}
+.modal-lg{max-width:760px}
+.modal-xl{max-width:960px}
+.timeline-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid #1e293b}
+.timeline-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px}
+.stat-card{background:#0f172a;border:1px solid #1e293b;border-radius:12px;padding:20px}
+.alert-banner{background:#ef444415;border:1px solid #ef444440;border-radius:10px;padding:14px 18px;display:flex;align-items:center;gap:12px}
+.tab{padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:#64748b;transition:all .15s}
+.tab.active{background:#0dd1ff20;color:#0dd1ff}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:#0f172a}::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ LOGIN ═══════════════ -->
+<div id="pg-login" class="min-h-screen flex items-center justify-center p-4">
+  <div class="card p-8 w-full max-w-md">
+    <div class="text-center mb-8">
+      <div style="font-size:32px;margin-bottom:8px">🎯</div>
+      <h1 class="text-2xl font-bold text-white">SEONGON CRM</h1>
+      <p class="text-slate-400 text-sm mt-1">Đăng nhập để tiếp tục</p>
+    </div>
+    <div class="space-y-4">
+      <input id="l-email" type="email" placeholder="Email" autocomplete="email">
+      <input id="l-pass" type="password" placeholder="Mật khẩu" autocomplete="current-password">
+      <div id="l-err" class="text-red-400 text-sm hidden"></div>
+      <button class="btn btn-primary w-full py-3 text-base" onclick="doLogin()">Đăng nhập →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ INVITE ACCEPT ═══════════════ -->
+<div id="pg-invite" class="min-h-screen flex items-center justify-center p-4 hidden">
+  <div class="card p-8 w-full max-w-md">
+    <div class="text-center mb-8">
+      <div style="font-size:32px;margin-bottom:8px">🎉</div>
+      <h1 class="text-xl font-bold text-white">Kích hoạt tài khoản</h1>
+      <p class="text-slate-400 text-sm mt-1">Đặt mật khẩu để bắt đầu sử dụng CRM</p>
+    </div>
+    <div class="space-y-4">
+      <div>
+        <label class="text-xs text-slate-400 mb-1 block">Họ tên</label>
+        <input id="inv-name" type="text" placeholder="Nhập họ tên của bạn">
+      </div>
+      <div>
+        <label class="text-xs text-slate-400 mb-1 block">Mật khẩu (tối thiểu 8 ký tự)</label>
+        <input id="inv-pass" type="password" placeholder="Đặt mật khẩu">
+      </div>
+      <div>
+        <label class="text-xs text-slate-400 mb-1 block">Xác nhận mật khẩu</label>
+        <input id="inv-pass2" type="password" placeholder="Nhập lại mật khẩu">
+      </div>
+      <div id="inv-err" class="text-red-400 text-sm hidden"></div>
+      <button class="btn btn-primary w-full py-3 text-base" onclick="doAcceptInvite()">Kích hoạt →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ APP SHELL ═══════════════ -->
+<div id="pg-app" class="hidden flex h-screen overflow-hidden">
+  <!-- Sidebar -->
+  <div class="sidebar flex flex-col">
+    <!-- Logo -->
+    <div class="p-5 border-b border-slate-800">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center text-black font-bold text-sm" style="background:#0dd1ff">S</div>
+        <div><div class="font-bold text-white text-sm">SEONGON CRM</div><div class="text-xs text-slate-500">Sales Platform</div></div>
+      </div>
+    </div>
+    <!-- Nav -->
+    <nav class="p-3 flex-1 space-y-1">
+      <div class="nav-item active" data-view="dashboard" onclick="showView('dashboard')"><span>📊</span> Dashboard</div>
+      <div class="nav-item" data-view="pipeline" onclick="showView('pipeline')"><span>🎯</span> Pipeline</div>
+      <div class="nav-item" data-view="leads" onclick="showView('leads')"><span>👥</span> Tất cả leads</div>
+      <div class="nav-item admin-only" data-view="alerts" onclick="showView('alerts')"><span>🚨</span> Cảnh báo</div>
+      <div class="h-px bg-slate-800 my-2"></div>
+      <div class="nav-item admin-only" data-view="users" onclick="showView('users')"><span>👤</span> Nhân viên</div>
+      <div class="nav-item admin-only" data-view="rules" onclick="showView('rules')"><span>⚙️</span> Phân lead tự động</div>
+    </nav>
+    <!-- User info -->
+    <div class="p-4 border-t border-slate-800">
+      <div class="flex items-center gap-3 mb-3">
+        <div id="user-avatar" class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm" style="background:#0dd1ff;color:#000">T</div>
+        <div class="flex-1 min-w-0">
+          <div id="user-name" class="text-sm font-semibold text-white truncate">Đang tải...</div>
+          <div id="user-role" class="text-xs text-slate-500">—</div>
+        </div>
+      </div>
+      <button class="btn btn-ghost w-full text-xs" onclick="doLogout()">Đăng xuất</button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="flex-1 flex flex-col overflow-hidden">
+    <!-- Header -->
+    <div class="border-b border-slate-800 px-6 py-3 flex items-center gap-3" style="background:#030712">
+      <input id="search-input" type="text" placeholder="🔍 Tìm kiếm khách hàng..." class="max-w-xs" style="padding:7px 12px" oninput="handleSearch(this.value)">
+      <div class="flex-1"></div>
+      <button class="btn btn-ghost text-sm" id="btn-import" onclick="openImportModal()">📥 Nhập Excel</button>
+      <button class="btn btn-primary text-sm" onclick="openAddModal()">+ Thêm lead</button>
+    </div>
+    <!-- View Container -->
+    <div class="flex-1 overflow-y-auto p-6" id="view-container">
+      <div class="text-center text-slate-400 py-20">Đang tải...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ MODALS ═══════════════ -->
+<!-- Lead Detail Modal -->
+<div id="modal-lead" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('lead')">
+  <div class="modal modal-xl"><div id="modal-lead-content"></div></div>
+</div>
+<!-- Add/Edit Modal -->
+<div id="modal-form" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('form')">
+  <div class="modal modal-lg"><div id="modal-form-content"></div></div>
+</div>
+<!-- Import Modal -->
+<div id="modal-import" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('import')">
+  <div class="modal modal-lg"><div id="modal-import-content"></div></div>
+</div>
+<!-- Confirm Modal -->
+<div id="modal-confirm" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('confirm')">
+  <div class="modal modal-sm"><div id="modal-confirm-content"></div></div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════════
+const S = {
+  token: localStorage.getItem('crm_token'),
+  user: null, leads: [], users: [], teams: [], rules: [],
+  currentView: 'dashboard', searchQ: '', editingLead: null
+};
+
+const API = '/api/crm2';
+const STAGES = {
+  tiem_nang: { label: 'Tiềm năng', color: '#6366f1', bg: '#6366f120' },
+  dam_phan:  { label: 'Đang đàm phán', color: '#f59e0b', bg: '#f59e0b20' },
+  bao_gia:   { label: 'Báo giá', color: '#3b82f6', bg: '#3b82f620' },
+  chot:      { label: 'Chốt ✅', color: '#10b981', bg: '#10b98120' }
+};
+const LOAI = { sieu_lon: 'Siêu lớn / Tư nhân', nha_nuoc: 'Nhà nước', sme: 'SME' };
+const LOAI_BADGE = { sieu_lon: '#6366f1', nha_nuoc: '#3b82f6', sme: '#10b981' };
+const CITY = { HCM: 'TP.HCM', HN: 'Hà Nội', khac: 'Tỉnh khác' };
+const ORDER = { cho_xu_ly:'Đã nhận đơn', dang_xu_ly:'Đang xử lý', da_giao:'Đã giao', hoan_thanh:'Hoàn thành ✅' };
+const ROLE = { admin:'Admin', truong_nhom:'Trưởng nhóm', bd:'BD' };
+const ACT_ICON = { tao_moi:'🆕', cap_nhat:'✏️', doi_stage:'🔄', phan_cong:'👤', ghi_chu:'💬', cuoc_goi:'📞', email:'📧', don_hang:'📦', default:'•' };
+
+// ══════════════════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════════════════
+async function api(action, data, method) {
+  const isGet = !data && method !== 'POST';
+  const url = isGet ? `${API}?action=${action}` : API;
+  const opts = { method: isGet ? 'GET' : 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${S.token}` } };
+  if (!isGet) opts.body = JSON.stringify({ action, ...data });
+  const r = await fetch(url, opts);
+  return r.json();
+}
+async function apiGet(action, params = {}) {
+  const q = new URLSearchParams({ action, ...params });
+  const r = await fetch(`${API}?${q}`, { headers: { Authorization: `Bearer ${S.token}` } });
+  return r.json();
+}
+
+function fmtVND(n) {
+  if (!n) return '—';
+  if (n >= 1e9) return `${(n/1e9).toFixed(1)} tỷ`;
+  if (n >= 1e6) return `${Math.round(n/1e6)} triệu`;
+  return n.toLocaleString('vi') + ' đ';
+}
+function fmtDate(d) {
+  if (!d) return '—';
+  return new Date(d).toLocaleDateString('vi-VN', { day:'2-digit', month:'2-digit', year:'numeric' });
+}
+function fmtAgo(d) {
+  if (!d) return '—';
+  const days = Math.floor((Date.now() - new Date(d+'Z').getTime()) / 864e5);
+  if (days === 0) return 'hôm nay';
+  if (days === 1) return 'hôm qua';
+  return `${days} ngày trước`;
+}
+function stageBadge(s) {
+  const st = STAGES[s] || STAGES.tiem_nang;
+  return `<span class="badge" style="background:${st.bg};color:${st.color}">${st.label}</span>`;
+}
+function loaiBadge(l) {
+  const c = LOAI_BADGE[l] || '#64748b';
+  return `<span class="badge" style="background:${c}20;color:${c}">${LOAI[l]||l}</span>`;
+}
+function toast(msg, type = 'success') {
+  const el = document.createElement('div');
+  el.style.cssText = `position:fixed;bottom:24px;right:24px;z-index:999;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:500;animation:fadeIn .2s;background:${type==='success'?'#10b981':'#ef4444'};color:#fff`;
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 2800);
+}
+function show(id) { document.getElementById(id)?.classList.remove('hidden'); }
+function hide(id) { document.getElementById(id)?.classList.add('hidden'); }
+function setHTML(id, html) { const el = document.getElementById(id); if(el) el.innerHTML = html; }
+function closeModal(m) { hide(`modal-${m}`); }
+
+// ══════════════════════════════════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════════════════════════════════
+async function doLogin() {
+  const email = document.getElementById('l-email').value.trim();
+  const pass = document.getElementById('l-pass').value;
+  const err = document.getElementById('l-err');
+  err.classList.add('hidden');
+  if (!email || !pass) { err.textContent = 'Nhập đầy đủ email và mật khẩu'; err.classList.remove('hidden'); return; }
+  try {
+    const r = await fetch(API + '?action=login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email, password: pass }) });
+    const d = await r.json();
+    if (!d.success) { err.textContent = d.error || 'Đăng nhập thất bại'; err.classList.remove('hidden'); return; }
+    S.token = d.token; S.user = d.user;
+    localStorage.setItem('crm_token', d.token);
+    bootApp();
+  } catch(e) { err.textContent = 'Lỗi kết nối'; err.classList.remove('hidden'); }
+}
+document.getElementById('l-pass').addEventListener('keydown', e => e.key==='Enter' && doLogin());
+
+async function doLogout() {
+  await api('logout', {}, 'POST').catch(()=>{});
+  localStorage.removeItem('crm_token');
+  S.token = null; S.user = null;
+  hide('pg-app'); show('pg-login');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// INVITE
+// ══════════════════════════════════════════════════════════════════
+let inviteToken = null;
+async function checkInviteParam() {
+  const params = new URLSearchParams(location.search);
+  const t = params.get('invite');
+  if (!t) return false;
+  const r = await fetch(`${API}?action=invite-info&token=${t}`);
+  const d = await r.json();
+  if (!d.success) { alert('Link mời không hợp lệ hoặc đã hết hạn.'); return false; }
+  inviteToken = t;
+  if (d.data.ho_ten) document.getElementById('inv-name').value = d.data.ho_ten;
+  hide('pg-login'); show('pg-invite');
+  return true;
+}
+async function doAcceptInvite() {
+  const name = document.getElementById('inv-name').value.trim();
+  const pass = document.getElementById('inv-pass').value;
+  const pass2 = document.getElementById('inv-pass2').value;
+  const err = document.getElementById('inv-err');
+  err.classList.add('hidden');
+  if (!name) { err.textContent = 'Nhập họ tên của bạn'; err.classList.remove('hidden'); return; }
+  if (pass.length < 8) { err.textContent = 'Mật khẩu tối thiểu 8 ký tự'; err.classList.remove('hidden'); return; }
+  if (pass !== pass2) { err.textContent = 'Mật khẩu không khớp'; err.classList.remove('hidden'); return; }
+  const r = await fetch(`${API}?action=accept-invite`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ token:inviteToken, password:pass, ho_ten:name }) });
+  const d = await r.json();
+  if (!d.success) { err.textContent = d.error || 'Lỗi'; err.classList.remove('hidden'); return; }
+  hide('pg-invite'); show('pg-login');
+  document.getElementById('l-err').textContent = '✅ Tài khoản đã kích hoạt! Đăng nhập ngay.';
+  document.getElementById('l-err').className = 'text-green-400 text-sm';
+  document.getElementById('l-err').classList.remove('hidden');
+  history.replaceState({}, '', '/crm');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// BOOT
+// ══════════════════════════════════════════════════════════════════
+async function bootApp() {
+  hide('pg-login');
+  // Load user if only token
+  if (S.token && !S.user) {
+    const d = await apiGet('me').catch(()=>({}));
+    if (!d.role) { hide('pg-app'); show('pg-login'); return; }
+    S.user = d;
+  }
+  if (!S.user) { show('pg-login'); return; }
+
+  // Setup sidebar by role
+  const isAdmin = S.user.role === 'admin';
+  document.querySelectorAll('.admin-only').forEach(el => {
+    if (!isAdmin && S.user.role !== 'truong_nhom') el.style.display = 'none';
+    else if (!isAdmin && el.dataset?.view === 'rules') el.style.display = 'none';
+  });
+
+  // Update user info
+  document.getElementById('user-name').textContent = S.user.ho_ten;
+  document.getElementById('user-role').textContent = (isAdmin ? 'Admin' : S.user.role === 'truong_nhom' ? 'Trưởng nhóm' : 'BD');
+  document.getElementById('user-avatar').textContent = S.user.ho_ten[0];
+
+  show('pg-app');
+  await loadAllData();
+  showView('dashboard');
+}
+
+async function loadAllData() {
+  const [leadsR, teamsR] = await Promise.all([apiGet('leads'), apiGet('teams')]);
+  S.leads = leadsR.data || [];
+  S.teams = teamsR.data || [];
+  if (S.user.role !== 'bd') {
+    const usersR = await apiGet('users');
+    S.users = usersR.data || [];
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// VIEWS
+// ══════════════════════════════════════════════════════════════════
+function showView(name) {
+  S.currentView = name;
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', el.dataset.view === name));
+  switch(name) {
+    case 'dashboard': renderDashboard(); break;
+    case 'pipeline':  renderPipeline(); break;
+    case 'leads':     renderLeads(); break;
+    case 'users':     renderUsers(); break;
+    case 'rules':     renderRules(); break;
+    case 'alerts':    renderAlerts(); break;
+  }
+}
+function handleSearch(q) {
+  S.searchQ = q.toLowerCase();
+  if (S.currentView === 'leads') renderLeads();
+  if (S.currentView === 'pipeline') renderPipeline();
+}
+
+// ─────────────────── DASHBOARD ───────────────────
+async function renderDashboard() {
+  setHTML('view-container', '<div class="text-center text-slate-400 py-20">Đang tải...</div>');
+  const d = await apiGet('stats');
+  const pipeline = d.pipeline || [];
+  const stageMap = {};
+  pipeline.forEach(p => stageMap[p.stage] = p);
+  const alertCount = d.alert_count || 0;
+  const totalVal = pipeline.reduce((a, p) => a + (p.total || 0), 0);
+  const totalLeads = pipeline.reduce((a, p) => a + (p.cnt || 0), 0);
+
+  let html = '';
+  if (alertCount > 0) {
+    html += `<div class="alert-banner mb-6 cursor-pointer" onclick="showView('alerts')">
+      <span class="text-2xl">🚨</span>
+      <div class="flex-1"><b class="text-red-400">${alertCount} deal rủi ro</b> — im lặng quá 7 ngày với giá trị ≥ 200M</div>
+      <span class="text-red-400 text-sm">Xem ngay →</span>
+    </div>`;
+  }
+
+  html += `<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">`;
+  html += `<div class="stat-card"><div class="text-3xl font-bold text-white">${totalLeads}</div><div class="text-slate-400 text-sm mt-1">Tổng leads</div></div>`;
+  html += `<div class="stat-card"><div class="text-3xl font-bold" style="color:#0dd1ff">${fmtVND(totalVal)}</div><div class="text-slate-400 text-sm mt-1">Tổng giá trị pipeline</div></div>`;
+  html += `<div class="stat-card"><div class="text-3xl font-bold" style="color:#10b981">${stageMap['chot']?.cnt || 0}</div><div class="text-slate-400 text-sm mt-1">Đã chốt</div></div>`;
+  html += `<div class="stat-card"><div class="text-3xl font-bold" style="color:#f59e0b">${stageMap['dam_phan']?.cnt || 0}</div><div class="text-slate-400 text-sm mt-1">Đang đàm phán</div></div>`;
+  html += `</div>`;
+
+  html += `<div class="grid grid-cols-4 gap-3 mb-6">`;
+  ['tiem_nang','dam_phan','bao_gia','chot'].forEach(s => {
+    const st = STAGES[s]; const p = stageMap[s] || {};
+    html += `<div class="card p-4 cursor-pointer hover:border-slate-600 transition" onclick="showView('pipeline')">
+      <div class="text-xs font-semibold mb-2" style="color:${st.color}">${st.label}</div>
+      <div class="text-2xl font-bold text-white">${p.cnt||0}</div>
+      <div class="text-xs text-slate-500 mt-1">${fmtVND(p.total)}</div>
+    </div>`;
+  });
+  html += `</div>`;
+
+  html += `<div class="card p-5"><div class="flex items-center justify-between mb-4">
+    <h3 class="font-semibold text-white">Leads gần đây</h3>
+    <button class="btn btn-ghost text-xs" onclick="showView('leads')">Xem tất cả</button>
+  </div><div class="space-y-2">`;
+  (d.recent || []).forEach(r => {
+    html += `<div class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-800 cursor-pointer transition" onclick="openLeadModal(${r.id})">
+      <div class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0" style="background:#0dd1ff20;color:#0dd1ff">${r.ho_ten[0]}</div>
+      <div class="flex-1 min-w-0"><div class="text-sm font-medium text-white truncate">${r.ho_ten}${r.cong_ty?` <span class="text-slate-500 font-normal">· ${r.cong_ty}</span>`:''}</div>
+      <div class="text-xs text-slate-500">${fmtDate(r.created_at)} · ${r.bd_name||'Chưa phân'}</div></div>
+      ${stageBadge(r.stage)}
+      <div class="text-sm font-semibold text-slate-300">${fmtVND(r.gia_tri)}</div>
+    </div>`;
+  });
+  if (!(d.recent||[]).length) html += '<div class="text-slate-500 text-sm text-center py-4">Chưa có lead nào</div>';
+  html += `</div></div>`;
+
+  setHTML('view-container', html);
+}
+
+// ─────────────────── PIPELINE ───────────────────
+function renderPipeline() {
+  const q = S.searchQ;
+  const filtered = S.leads.filter(l => !q || l.ho_ten.toLowerCase().includes(q) || (l.cong_ty||'').toLowerCase().includes(q));
+  const byStage = {};
+  Object.keys(STAGES).forEach(s => byStage[s] = filtered.filter(l => l.stage === s));
+
+  let html = `<div class="grid gap-4" style="grid-template-columns:repeat(4,1fr)">`;
+  Object.entries(STAGES).forEach(([s, st]) => {
+    const cards = byStage[s] || [];
+    const totalVal = cards.reduce((a, l) => a + (l.gia_tri||0), 0);
+    html += `<div class="kanban-col" style="background:${st.bg}" data-stage="${s}"
+      ondragover="event.preventDefault();this.classList.add('drag-over')"
+      ondragleave="this.classList.remove('drag-over')"
+      ondrop="handleDrop(event,'${s}')">
+      <div class="flex items-center justify-between mb-3">
+        <div class="font-semibold text-sm" style="color:${st.color}">${st.label}</div>
+        <div class="text-xs text-slate-500">${cards.length} · ${fmtVND(totalVal)}</div>
+      </div>`;
+    cards.forEach(l => {
+      const days = Math.floor((Date.now() - new Date((l.last_contact_at||l.created_at)+'Z').getTime()) / 864e5);
+      const stale = days >= 7 && l.gia_tri >= 200000000;
+      html += `<div class="lead-card${stale?' border-red-900':''}" draggable="true" data-id="${l.id}"
+        ondragstart="handleDragStart(event,${l.id})" ondragend="this.classList.remove('dragging')"
+        onclick="openLeadModal(${l.id})">
+        ${stale?'<div class="text-xs text-red-400 mb-2">⚠️ Im lặng '+days+' ngày</div>':''}
+        <div class="font-semibold text-sm text-white mb-1 truncate">${l.ho_ten}</div>
+        ${l.cong_ty?`<div class="text-xs text-slate-400 mb-2 truncate">${l.cong_ty}</div>`:''}
+        <div class="flex items-center justify-between mt-2">
+          <div class="text-xs font-bold" style="color:#0dd1ff">${fmtVND(l.gia_tri)}</div>
+          ${loaiBadge(l.loai_khach)}
+        </div>
+        <div class="text-xs text-slate-500 mt-2">${l.bd_name||'Chưa phân công'} · ${fmtAgo(l.last_contact_at)}</div>
+      </div>`;
+    });
+    if (!cards.length) html += `<div class="text-center text-slate-600 text-xs py-8">Kéo thả lead vào đây</div>`;
+    html += `</div>`;
+  });
+  html += `</div>`;
+  setHTML('view-container', html);
+}
+
+let dragId = null;
+function handleDragStart(e, id) {
+  dragId = id;
+  e.currentTarget.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+}
+async function handleDrop(e, stage) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  if (!dragId) return;
+  const lead = S.leads.find(l => l.id === dragId);
+  if (!lead || lead.stage === stage) return;
+  lead.stage = stage;
+  renderPipeline();
+  const r = await api('lead:move', { id: dragId, stage });
+  if (!r.success) { toast('Lỗi cập nhật', 'error'); await loadAllData(); renderPipeline(); }
+  dragId = null;
+}
+
+// ─────────────────── LEADS TABLE ───────────────────
+function renderLeads() {
+  const q = S.searchQ;
+  const filtered = S.leads.filter(l => !q || l.ho_ten.toLowerCase().includes(q) || (l.cong_ty||'').toLowerCase().includes(q) || (l.email||'').includes(q) || (l.dien_thoai||'').includes(q));
+
+  let html = `<div class="card overflow-hidden">
+    <table class="w-full text-sm" style="border-collapse:collapse">
+    <thead><tr style="border-bottom:1px solid #1e293b">
+      <th class="text-left p-3 text-slate-400 font-medium">Khách hàng</th>
+      <th class="text-left p-3 text-slate-400 font-medium">Liên hệ</th>
+      <th class="text-left p-3 text-slate-400 font-medium">Pipeline</th>
+      <th class="text-left p-3 text-slate-400 font-medium">Giá trị</th>
+      <th class="text-left p-3 text-slate-400 font-medium">Phụ trách</th>
+      <th class="text-left p-3 text-slate-400 font-medium">Liên hệ cuối</th>
+    </tr></thead><tbody>`;
+  filtered.forEach(l => {
+    html += `<tr class="hover:bg-slate-900 cursor-pointer transition border-b border-slate-800" onclick="openLeadModal(${l.id})">
+      <td class="p-3"><div class="font-medium text-white">${l.ho_ten}</div><div class="text-xs text-slate-500">${l.cong_ty||'—'}</div></td>
+      <td class="p-3"><div class="text-slate-300">${l.email||'—'}</div><div class="text-xs text-slate-500">${l.dien_thoai||''}</div></td>
+      <td class="p-3">${stageBadge(l.stage)}</td>
+      <td class="p-3 font-semibold text-slate-200">${fmtVND(l.gia_tri)}</td>
+      <td class="p-3 text-slate-400">${l.bd_name||'Chưa phân'}</td>
+      <td class="p-3 text-slate-500 text-xs">${fmtAgo(l.last_contact_at)}</td>
+    </tr>`;
+  });
+  if (!filtered.length) html += `<tr><td colspan="6" class="text-center text-slate-500 py-12">Không tìm thấy lead nào</td></tr>`;
+  html += `</tbody></table></div>`;
+  setHTML('view-container', html);
+}
+
+// ─────────────────── USERS ───────────────────
+function renderUsers() {
+  const teamMap = {};
+  S.teams.forEach(t => teamMap[t.id] = t);
+
+  let html = `<div class="flex items-center justify-between mb-5">
+    <h2 class="text-xl font-bold text-white">Quản lý nhân viên</h2>
+    <button class="btn btn-primary text-sm" onclick="openInviteModal()">+ Mời nhân viên</button>
+  </div>`;
+
+  // Group by team
+  const byTeam = { admin: [], ...Object.fromEntries(S.teams.map(t => [t.id, []])) };
+  S.users.forEach(u => {
+    if (u.role === 'admin') byTeam.admin.push(u);
+    else if (u.team_id) (byTeam[u.team_id] = byTeam[u.team_id]||[]).push(u);
+    else (byTeam[0] = byTeam[0]||[]).push(u);
+  });
+
+  // Admin
+  if (byTeam.admin.length) {
+    html += `<div class="card p-4 mb-4"><div class="font-semibold text-slate-300 mb-3 text-sm">👑 Admin</div>`;
+    html += byTeam.admin.map(u => userRow(u)).join('');
+    html += `</div>`;
+  }
+
+  S.teams.forEach(t => {
+    const members = byTeam[t.id] || [];
+    html += `<div class="card p-4 mb-4">
+      <div class="flex items-center gap-2 mb-3">
+        <div class="w-3 h-3 rounded-full" style="background:${t.mau}"></div>
+        <div class="font-semibold text-slate-300 text-sm">${t.ten}</div>
+        <div class="text-xs text-slate-500">${members.length} người</div>
+      </div>`;
+    if (members.length) html += members.map(u => userRow(u)).join('');
+    else html += `<div class="text-slate-600 text-xs text-center py-3">Chưa có thành viên — Mời nhân viên để bắt đầu</div>`;
+    html += `</div>`;
+  });
+
+  setHTML('view-container', html);
+}
+function userRow(u) {
+  const roleColor = { admin:'#0dd1ff', truong_nhom:'#f59e0b', bd:'#10b981' };
+  return `<div class="flex items-center gap-3 py-2 px-2 rounded-lg hover:bg-slate-800">
+    <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs" style="background:${roleColor[u.role]||'#64748b'}30;color:${roleColor[u.role]||'#64748b'}">${u.ho_ten[0]}</div>
+    <div class="flex-1"><div class="text-sm text-white">${u.ho_ten}</div><div class="text-xs text-slate-500">${u.email}</div></div>
+    <span class="badge" style="background:${roleColor[u.role]||'#64748b'}20;color:${roleColor[u.role]||'#64748b'}">${ROLE[u.role]||u.role}</span>
+    ${!u.is_active?'<span class="badge" style="background:#ef444420;color:#ef4444">Tạm khoá</span>':''}
+    ${S.user.role==='admin'&&u.role!=='admin'?`<button class="btn ${u.is_active?'btn-danger':'btn-ghost'} text-xs py-1 px-2" onclick="toggleUser(${u.id},${u.is_active})">${u.is_active?'Khoá':'Mở khoá'}</button>`:''}
+  </div>`;
+}
+async function toggleUser(id, active) {
+  const r = await api(active?'user:deactivate':'user:activate', { id });
+  if (r.success) { await loadAllData(); renderUsers(); toast(active?'Đã khoá tài khoản':'Đã mở khoá'); }
+  else toast(r.error||'Lỗi', 'error');
+}
+
+function openInviteModal() {
+  const teamOpts = S.teams.map(t => `<option value="${t.id}">${t.ten}</option>`).join('');
+  setHTML('modal-form-content', `
+    <div class="p-6">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-xl font-bold text-white">Mời nhân viên</h2>
+        <button class="text-slate-400 hover:text-white text-2xl" onclick="closeModal('form')">&times;</button>
+      </div>
+      <div class="space-y-4">
+        <div><label class="text-xs text-slate-400 mb-1 block">Họ tên</label><input id="inv-f-name" type="text" placeholder="Nguyễn Văn A"></div>
+        <div><label class="text-xs text-slate-400 mb-1 block">Email</label><input id="inv-f-email" type="email" placeholder="email@seongon.com"></div>
+        <div><label class="text-xs text-slate-400 mb-1 block">Vai trò</label>
+          <select id="inv-f-role"><option value="bd">BD</option><option value="truong_nhom">Trưởng nhóm</option></select></div>
+        <div><label class="text-xs text-slate-400 mb-1 block">Team</label>
+          <select id="inv-f-team"><option value="">— Chưa chọn —</option>${teamOpts}</select></div>
+        <div class="flex gap-3 pt-2">
+          <button class="btn btn-ghost flex-1" onclick="closeModal('form')">Huỷ</button>
+          <button class="btn btn-primary flex-1" onclick="doInvite()">Gửi lời mời</button>
+        </div>
+      </div>
+    </div>`);
+  show('modal-form');
+}
+async function doInvite() {
+  const ho_ten = document.getElementById('inv-f-name').value.trim();
+  const email = document.getElementById('inv-f-email').value.trim();
+  const role = document.getElementById('inv-f-role').value;
+  const team_id = document.getElementById('inv-f-team').value;
+  if (!ho_ten || !email) { toast('Nhập đầy đủ tên và email', 'error'); return; }
+  const r = await api('user:invite', { ho_ten, email, role, team_id: team_id||null });
+  if (r.success) { closeModal('form'); toast(`Đã gửi lời mời tới ${email} ✅`); }
+  else toast(r.error||'Lỗi gửi mail', 'error');
+}
+
+// ─────────────────── RULES ───────────────────
+async function renderRules() {
+  const r = await apiGet('rules');
+  const rules = r.data || [];
+  const teamOpts = S.teams.map(t => `<option value="${t.id}">${t.ten}</option>`).join('');
+
+  let html = `<div class="flex items-center justify-between mb-5">
+    <div>
+      <h2 class="text-xl font-bold text-white">Phân lead tự động</h2>
+      <p class="text-slate-400 text-sm mt-1">Lead mới sẽ tự động vào đúng team theo thứ tự ưu tiên</p>
+    </div>
+    <button class="btn btn-primary text-sm" onclick="openRuleModal()">+ Thêm rule</button>
+  </div>
+  <div class="card overflow-hidden">
+    <table class="w-full text-sm"><thead><tr style="border-bottom:1px solid #1e293b">
+      <th class="text-left p-3 text-slate-400 font-medium">Thứ tự</th>
+      <th class="text-left p-3 text-slate-400 font-medium">Tên rule</th>
+      <th class="text-left p-3 text-slate-400 font-medium">Loại khách</th>
+      <th class="text-left p-3 text-slate-400 font-medium">Thành phố</th>
+      <th class="text-left p-3 text-slate-400 font-medium">Giá trị min</th>
+      <th class="text-left p-3 text-slate-400 font-medium">Team nhận</th>
+      <th class="text-left p-3 text-slate-400 font-medium">Trạng thái</th>
+      <th class="p-3"></th>
+    </tr></thead><tbody>`;
+
+  rules.forEach((r, i) => {
+    html += `<tr class="border-b border-slate-800">
+      <td class="p-3 text-slate-400 font-mono">${i+1}</td>
+      <td class="p-3 text-white font-medium">${r.ten}</td>
+      <td class="p-3 text-slate-300">${r.loai_khach ? LOAI[r.loai_khach]||r.loai_khach : '— Tất cả —'}</td>
+      <td class="p-3 text-slate-300">${r.thanh_pho ? (CITY[r.thanh_pho]||r.thanh_pho) : '— Tất cả —'}</td>
+      <td class="p-3 text-slate-300">${r.gia_tri_min ? fmtVND(r.gia_tri_min) : '—'}</td>
+      <td class="p-3"><span class="font-semibold text-white">${r.team_name}</span></td>
+      <td class="p-3">${r.is_active?'<span class="badge" style="background:#10b98120;color:#10b981">Bật</span>':'<span class="badge" style="background:#64748b20;color:#64748b">Tắt</span>'}</td>
+      <td class="p-3 flex gap-2">
+        <button class="btn btn-ghost text-xs" onclick='openRuleModal(${JSON.stringify(r)})'>Sửa</button>
+        <button class="btn btn-danger text-xs" onclick="deleteRule(${r.id})">Xoá</button>
+      </td>
+    </tr>`;
+  });
+  if (!rules.length) html += `<tr><td colspan="8" class="text-center text-slate-500 py-8">Chưa có rule nào</td></tr>`;
+  html += `</tbody></table></div>
+  <div class="card p-4 mt-4 text-sm text-slate-400">
+    💡 <b class="text-slate-300">Cách hoạt động:</b> Khi thêm lead mới, hệ thống kiểm tra từng rule theo thứ tự — rule đầu tiên khớp sẽ được áp dụng. Nếu không có rule nào khớp, lead vào "Chưa phân team".
+  </div>`;
+  setHTML('view-container', html);
+}
+function openRuleModal(rule) {
+  const teamOpts = S.teams.map(t => `<option value="${t.id}" ${rule&&rule.team_id==t.id?'selected':''}>${t.ten}</option>`).join('');
+  setHTML('modal-form-content', `<div class="p-6">
+    <div class="flex items-center justify-between mb-5">
+      <h2 class="text-xl font-bold text-white">${rule?'Sửa rule':'Thêm rule phân lead'}</h2>
+      <button class="text-slate-400 hover:text-white text-2xl" onclick="closeModal('form')">&times;</button>
+    </div>
+    <div class="space-y-4">
+      <div><label class="text-xs text-slate-400 mb-1 block">Tên rule</label>
+        <input id="rl-ten" value="${rule?.ten||''}" placeholder="Vd: SME HCM → Team Nam"></div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="text-xs text-slate-400 mb-1 block">Loại khách</label>
+          <select id="rl-loai"><option value="">— Tất cả loại —</option>
+            ${Object.entries(LOAI).map(([v,l])=>`<option value="${v}" ${rule?.loai_khach==v?'selected':''}>${l}</option>`).join('')}
+          </select></div>
+        <div><label class="text-xs text-slate-400 mb-1 block">Thành phố</label>
+          <select id="rl-city"><option value="">— Tất cả TP —</option>
+            ${Object.entries(CITY).map(([v,l])=>`<option value="${v}" ${rule?.thanh_pho==v?'selected':''}>${l}</option>`).join('')}
+          </select></div>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="text-xs text-slate-400 mb-1 block">Giá trị deal tối thiểu (VND)</label>
+          <input id="rl-val" type="number" value="${rule?.gia_tri_min||''}" placeholder="Bỏ trống = không giới hạn"></div>
+        <div><label class="text-xs text-slate-400 mb-1 block">Thứ tự ưu tiên (số nhỏ = cao hơn)</label>
+          <input id="rl-ord" type="number" value="${rule?.thu_tu||0}"></div>
+      </div>
+      <div><label class="text-xs text-slate-400 mb-1 block">Team nhận lead</label>
+        <select id="rl-team"><option value="">— Chọn team —</option>${teamOpts}</select></div>
+      <div class="flex items-center gap-2">
+        <input type="checkbox" id="rl-active" ${!rule||rule.is_active?'checked':''} class="w-4 h-4">
+        <label for="rl-active" class="text-sm text-slate-300">Bật rule này</label></div>
+      <div class="flex gap-3 pt-2">
+        <button class="btn btn-ghost flex-1" onclick="closeModal('form')">Huỷ</button>
+        <button class="btn btn-primary flex-1" onclick="saveRule(${rule?.id||'null'})">Lưu</button>
+      </div>
+    </div></div>`);
+  show('modal-form');
+}
+async function saveRule(id) {
+  const ten = document.getElementById('rl-ten').value.trim();
+  const team_id = document.getElementById('rl-team').value;
+  if (!ten || !team_id) { toast('Nhập tên rule và chọn team', 'error'); return; }
+  const r = await api('rule:save', {
+    id: id||undefined, ten, loai_khach: document.getElementById('rl-loai').value||null,
+    thanh_pho: document.getElementById('rl-city').value||null,
+    gia_tri_min: Number(document.getElementById('rl-val').value)||null,
+    team_id: Number(team_id), thu_tu: Number(document.getElementById('rl-ord').value)||0,
+    is_active: document.getElementById('rl-active').checked
+  });
+  if (r.success) { closeModal('form'); toast('Đã lưu rule ✅'); renderRules(); }
+  else toast(r.error||'Lỗi', 'error');
+}
+async function deleteRule(id) {
+  if (!confirm('Xoá rule này?')) return;
+  const r = await api('rule:delete', { id });
+  if (r.success) { toast('Đã xoá'); renderRules(); }
+}
+
+// ─────────────────── ALERTS ───────────────────
+async function renderAlerts() {
+  setHTML('view-container', '<div class="text-center text-slate-400 py-20">Đang kiểm tra...</div>');
+  const d = await apiGet('alerts');
+  const alerts = d.data || [];
+
+  let html = `<div class="flex items-center justify-between mb-5">
+    <div>
+      <h2 class="text-xl font-bold text-white">🚨 Deal rủi ro</h2>
+      <p class="text-slate-400 text-sm mt-1">Deal ≥ 200 triệu đồng không có liên hệ trong 7+ ngày</p>
+    </div>
+    ${alerts.length?`<button class="btn btn-danger text-sm" onclick="sendAlerts()">📱 Gửi cảnh báo Telegram</button>`:''}
+  </div>`;
+
+  if (!alerts.length) {
+    html += `<div class="card p-12 text-center"><div class="text-4xl mb-3">✅</div><div class="text-slate-300 font-semibold">Tất cả deal đều ổn!</div><div class="text-slate-500 text-sm mt-1">Không có deal nào im lặng quá 7 ngày</div></div>`;
+  } else {
+    alerts.forEach(l => {
+      const days = Math.floor((Date.now() - new Date((l.last_contact_at||l.created_at)+'Z').getTime()) / 864e5);
+      html += `<div class="card p-5 mb-3 cursor-pointer hover:border-red-900 transition" onclick="openLeadModal(${l.id})">
+        <div class="flex items-start gap-4">
+          <div class="text-3xl">⚠️</div>
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="font-bold text-white text-base">${l.ho_ten}</span>
+              ${l.cong_ty?`<span class="text-slate-400 text-sm">· ${l.cong_ty}</span>`:''}
+              ${stageBadge(l.stage)}
+            </div>
+            <div class="grid grid-cols-3 gap-4 mt-3 text-sm">
+              <div><div class="text-slate-500 text-xs">Giá trị deal</div><div class="font-bold text-red-400">${fmtVND(l.gia_tri)}</div></div>
+              <div><div class="text-slate-500 text-xs">Im lặng</div><div class="font-bold text-red-400">${days} ngày</div></div>
+              <div><div class="text-slate-500 text-xs">Phụ trách</div><div class="text-slate-300">${l.bd_name||'Chưa phân'} (${l.team_name||'?'})</div></div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    });
+  }
+  setHTML('view-container', html);
+}
+async function sendAlerts() {
+  const r = await api('alerts:send', {});
+  if (r.success) toast(r.sent > 0 ? `Đã gửi ${r.sent} cảnh báo vào Telegram ✅` : 'Không có deal rủi ro');
+  else toast(r.error||'Lỗi', 'error');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// LEAD DETAIL MODAL
+// ══════════════════════════════════════════════════════════════════
+async function openLeadModal(id) {
+  show('modal-lead');
+  setHTML('modal-lead-content', '<div class="p-8 text-center text-slate-400">Đang tải...</div>');
+  const d = await apiGet('lead', { id });
+  if (!d.success) { setHTML('modal-lead-content', '<div class="p-8 text-center text-red-400">Lỗi tải dữ liệu</div>'); return; }
+  const l = d.lead;
+  const acts = d.activities || [];
+
+  const bdOpts = S.users.filter(u => u.team_id == l.team_id && u.role === 'bd')
+    .map(u => `<option value="${u.id}" ${l.assigned_to==u.id?'selected':''}>${u.ho_ten}</option>`).join('');
+  const canAssign = S.user.role !== 'bd';
+  const canEdit = S.user.role === 'admin' || S.user.role === 'truong_nhom' || l.assigned_to == S.user.user_id;
+
+  const stageOpts = Object.entries(STAGES).map(([v,st]) => `<option value="${v}" ${l.stage===v?'selected':''}>${st.label}</option>`).join('');
+
+  const html = `<div class="p-6">
+    <div class="flex items-start justify-between mb-5">
+      <div>
+        <h2 class="text-2xl font-bold text-white">${l.ho_ten}</h2>
+        <div class="text-slate-400 text-sm mt-1">${l.cong_ty||''}${l.chuc_vu?' · '+l.chuc_vu:''}</div>
+      </div>
+      <div class="flex gap-2 items-center">
+        ${canEdit?`<button class="btn btn-ghost text-sm" onclick="openEditModal(${id})">✏️ Sửa</button>`:''}
+        ${S.user.role==='admin'?`<button class="btn btn-danger text-sm" onclick="deleteLead(${id})">🗑️</button>`:''}
+        <button class="text-slate-400 hover:text-white text-2xl ml-2" onclick="closeModal('lead')">&times;</button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-3 gap-4 mb-5">
+      <!-- Info -->
+      <div class="col-span-2 space-y-3">
+        <div class="grid grid-cols-2 gap-3 text-sm">
+          <div class="card p-3"><div class="text-xs text-slate-500 mb-1">Email</div><div class="text-white">${l.email||'—'}</div></div>
+          <div class="card p-3"><div class="text-xs text-slate-500 mb-1">SĐT</div><div class="text-white">${l.dien_thoai||'—'}</div></div>
+          <div class="card p-3"><div class="text-xs text-slate-500 mb-1">Loại khách</div><div>${loaiBadge(l.loai_khach)}</div></div>
+          <div class="card p-3"><div class="text-xs text-slate-500 mb-1">Thành phố</div><div class="text-white">${CITY[l.thanh_pho]||l.thanh_pho||'—'}</div></div>
+          <div class="card p-3"><div class="text-xs text-slate-500 mb-1">Giá trị deal</div><div class="text-xl font-bold" style="color:#0dd1ff">${fmtVND(l.gia_tri)}</div></div>
+          <div class="card p-3"><div class="text-xs text-slate-500 mb-1">Nguồn</div><div class="text-white capitalize">${l.nguon||'manual'}</div></div>
+        </div>
+        ${l.ghi_chu?`<div class="card p-3 text-sm text-slate-300"><div class="text-xs text-slate-500 mb-1">Ghi chú</div>${l.ghi_chu}</div>`:''}
+      </div>
+      <!-- Actions -->
+      <div class="space-y-3">
+        <div class="card p-4">
+          <div class="text-xs text-slate-500 mb-2">Pipeline</div>
+          <select class="text-sm" onchange="moveLead(${id},this.value)">${stageOpts}</select>
+        </div>
+        ${canAssign&&bdOpts?`<div class="card p-4">
+          <div class="text-xs text-slate-500 mb-2">Phân công BD</div>
+          <select class="text-sm" onchange="assignLead(${id},this.value)">
+            <option value="">— Chưa phân —</option>${bdOpts}</select>
+        </div>`:''}
+        <div class="card p-4">
+          <div class="text-xs text-slate-500 mb-2">Trạng thái đơn hàng</div>
+          <select class="text-sm" onchange="updateOrderStatus(${id},this.value)">
+            <option value="">— Chọn —</option>
+            ${Object.entries(ORDER).map(([v,lb])=>`<option value="${v}" ${l.trang_thai_don===v?'selected':''}>${lb}</option>`).join('')}
+          </select>
+          ${l.email?`<div class="text-xs text-slate-500 mt-2">📧 Mail tự động → ${l.email}</div>`:''}
+        </div>
+        <div class="card p-3 text-xs text-slate-500">
+          <div>📅 Tạo: ${fmtDate(l.created_at)}</div>
+          <div>🔄 Cập nhật: ${fmtDate(l.updated_at)}</div>
+          <div>📞 Liên hệ cuối: ${fmtAgo(l.last_contact_at)}</div>
+          <div class="mt-1">🏢 ${l.team_name||'Chưa có team'}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Activity -->
+    <div class="border-t border-slate-800 pt-4">
+      <h3 class="font-semibold text-white mb-3">Lịch sử hoạt động</h3>
+      <div class="flex gap-2 mb-4">
+        <select id="act-type" class="text-sm flex-shrink-0 w-36">
+          <option value="ghi_chu">💬 Ghi chú</option>
+          <option value="cuoc_goi">📞 Cuộc gọi</option>
+          <option value="email">📧 Email</option>
+        </select>
+        <input id="act-text" type="text" placeholder="Nhập nội dung..." class="text-sm flex-1">
+        <button class="btn btn-primary text-sm" onclick="addActivity(${id})">Thêm</button>
+      </div>
+      <div id="activity-list" class="space-y-0 max-h-64 overflow-y-auto">
+        ${acts.map(a => `<div class="timeline-item">
+          <div class="timeline-dot" style="background:#1e293b;font-size:14px">${ACT_ICON[a.loai]||ACT_ICON.default}</div>
+          <div class="flex-1 pt-1">
+            <div class="text-sm text-slate-300">${a.noi_dung}</div>
+            <div class="text-xs text-slate-600 mt-1">${a.author||'Hệ thống'} · ${fmtDate(a.created_at)}</div>
+          </div>
+        </div>`).join('') || '<div class="text-slate-500 text-sm text-center py-4">Chưa có hoạt động nào</div>'}
+      </div>
+    </div>
+  </div>`;
+  setHTML('modal-lead-content', html);
+}
+
+async function moveLead(id, stage) {
+  if (!stage) return;
+  const r = await api('lead:move', { id, stage });
+  if (r.success) { toast('Đã cập nhật pipeline ✅'); await loadAllData(); if(S.currentView==='pipeline') renderPipeline(); }
+  else toast(r.error||'Lỗi', 'error');
+}
+async function assignLead(id, userId) {
+  if (!userId) return;
+  const r = await api('lead:assign', { id, user_id: Number(userId) });
+  if (r.success) { toast('Đã phân công ✅'); await loadAllData(); }
+  else toast(r.error||'Lỗi', 'error');
+}
+async function updateOrderStatus(id, status) {
+  if (!status) return;
+  const r = await api('lead:order-status', { id, status });
+  if (r.success) toast(r.email_sent ? '✅ Đã cập nhật + gửi mail cho khách' : '✅ Đã cập nhật');
+  else toast(r.error||'Lỗi', 'error');
+}
+async function addActivity(leadId) {
+  const text = document.getElementById('act-text').value.trim();
+  const loai = document.getElementById('act-type').value;
+  if (!text) return;
+  const r = await api('lead:activity', { id: leadId, loai, noi_dung: text });
+  if (r.success) { document.getElementById('act-text').value = ''; toast('Đã thêm ghi chú'); openLeadModal(leadId); }
+  else toast(r.error||'Lỗi', 'error');
+}
+async function deleteLead(id) {
+  if (!confirm('Xoá lead này? Hành động không thể hoàn tác.')) return;
+  const r = await api('lead:delete', { id });
+  if (r.success) { closeModal('lead'); toast('Đã xoá'); await loadAllData(); showView(S.currentView); }
+  else toast(r.error||'Lỗi', 'error');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// ADD / EDIT LEAD MODAL
+// ══════════════════════════════════════════════════════════════════
+function openAddModal() { openLeadForm(null); }
+async function openEditModal(id) {
+  const d = await apiGet('lead', { id });
+  if (d.success) { closeModal('lead'); openLeadForm(d.lead); }
+}
+function openLeadForm(lead) {
+  const isEdit = !!lead;
+  const v = (f, def='') => lead ? (lead[f]||def) : def;
+  const html = `<div class="p-6">
+    <div class="flex items-center justify-between mb-5">
+      <h2 class="text-xl font-bold text-white">${isEdit?'Sửa thông tin':'Thêm lead mới'}</h2>
+      <button class="text-slate-400 hover:text-white text-2xl" onclick="closeModal('form')">&times;</button>
+    </div>
+    <div class="grid grid-cols-2 gap-4">
+      <div><label class="text-xs text-slate-400 mb-1 block">Họ tên *</label><input id="f-name" value="${v('ho_ten')}" placeholder="Nguyễn Văn A"></div>
+      <div><label class="text-xs text-slate-400 mb-1 block">Công ty</label><input id="f-company" value="${v('cong_ty')}" placeholder="Công ty ABC"></div>
+      <div><label class="text-xs text-slate-400 mb-1 block">Email</label><input id="f-email" type="email" value="${v('email')}" placeholder="email@company.com"></div>
+      <div><label class="text-xs text-slate-400 mb-1 block">SĐT</label><input id="f-phone" value="${v('dien_thoai')}" placeholder="0901234567"></div>
+      <div><label class="text-xs text-slate-400 mb-1 block">Chức vụ</label><input id="f-title" value="${v('chuc_vu')}" placeholder="Giám đốc Marketing"></div>
+      <div><label class="text-xs text-slate-400 mb-1 block">Giá trị deal (VND)</label><input id="f-val" type="number" value="${v('gia_tri',0)}" placeholder="500000000"></div>
+      <div><label class="text-xs text-slate-400 mb-1 block">Loại khách</label>
+        <select id="f-loai">
+          ${Object.entries(LOAI).map(([k,lb])=>`<option value="${k}" ${v('loai_khach','sme')===k?'selected':''}>${lb}</option>`).join('')}
+        </select></div>
+      <div><label class="text-xs text-slate-400 mb-1 block">Thành phố</label>
+        <select id="f-city">
+          ${Object.entries(CITY).map(([k,lb])=>`<option value="${k}" ${v('thanh_pho','HCM')===k?'selected':''}>${lb}</option>`).join('')}
+        </select></div>
+      ${!isEdit?`<div><label class="text-xs text-slate-400 mb-1 block">Nguồn</label>
+        <select id="f-nguon">
+          <option value="manual">Nhập tay</option><option value="form">Form web</option>
+          <option value="email">Email</option><option value="webhook">Webhook</option>
+        </select></div>`:'<div></div>'}
+      <div class="col-span-2"><label class="text-xs text-slate-400 mb-1 block">Ghi chú</label>
+        <textarea id="f-note" rows="2" placeholder="Ghi chú thêm...">${v('ghi_chu')}</textarea></div>
+    </div>
+    <div class="flex gap-3 mt-5">
+      <button class="btn btn-ghost flex-1" onclick="closeModal('form')">Huỷ</button>
+      <button class="btn btn-primary flex-1" onclick="saveLead(${lead?.id||'null'})">${isEdit?'Lưu thay đổi':'Thêm lead'}</button>
+    </div>
+  </div>`;
+  setHTML('modal-form-content', html);
+  show('modal-form');
+}
+async function saveLead(id) {
+  const data = {
+    ho_ten: document.getElementById('f-name').value.trim(),
+    cong_ty: document.getElementById('f-company').value.trim(),
+    email: document.getElementById('f-email').value.trim(),
+    dien_thoai: document.getElementById('f-phone').value.trim(),
+    chuc_vu: document.getElementById('f-title').value.trim(),
+    gia_tri: Number(document.getElementById('f-val').value)||0,
+    loai_khach: document.getElementById('f-loai').value,
+    thanh_pho: document.getElementById('f-city').value,
+    ghi_chu: document.getElementById('f-note').value.trim(),
+  };
+  if (!id) data.nguon = document.getElementById('f-nguon').value;
+  if (!data.ho_ten) { toast('Nhập tên khách hàng', 'error'); return; }
+  const r = await api(id ? 'lead:update' : 'lead:create', { ...data, id: id||undefined });
+  if (r.success) {
+    closeModal('form');
+    toast(id ? 'Đã cập nhật ✅' : `Lead mới đã thêm ✅${r.team_id ? ' — tự động vào '+S.teams.find(t=>t.id==r.team_id)?.ten : ''}`);
+    await loadAllData();
+    showView(S.currentView);
+    if (!id && r.id) openLeadModal(r.id);
+  } else if (r.dup_id) {
+    toast('Trùng email/SĐT — mở lead có sẵn', 'error');
+    closeModal('form'); openLeadModal(r.dup_id);
+  } else toast(r.error||'Lỗi', 'error');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// IMPORT MODAL
+// ══════════════════════════════════════════════════════════════════
+function openImportModal() {
+  setHTML('modal-import-content', `<div class="p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-xl font-bold text-white">📥 Nhập từ Excel</h2>
+      <button class="text-slate-400 hover:text-white text-2xl" onclick="closeModal('import')">&times;</button>
+    </div>
+    <p class="text-slate-400 text-sm mb-4">Copy dữ liệu từ Excel và paste vào đây. Mỗi dòng 1 khách, các cột cách nhau bởi Tab.<br>
+    <b class="text-slate-300">Thứ tự cột:</b> Tên | Email | SĐT | Công ty | Loại (sme/sieu_lon/nha_nuoc) | Thành phố (HCM/HN/khac)</p>
+    <div class="card p-3 mb-4 text-xs text-slate-400">
+      <div class="text-slate-300 font-semibold mb-2">Ví dụ:</div>
+      <div class="font-mono">Nguyễn Văn A	a@company.com	0901234567	Công ty XYZ	sme	HCM</div>
+      <div class="font-mono">Trần Thị B	b@corp.vn	0912345678	Corp VN	sieu_lon	HN</div>
+    </div>
+    <textarea id="import-paste" rows="8" placeholder="Paste dữ liệu Excel vào đây..." style="font-family:monospace;font-size:12px"></textarea>
+    <div id="import-preview" class="mt-3"></div>
+    <div class="flex gap-3 mt-4">
+      <button class="btn btn-ghost flex-1" onclick="closeModal('import')">Huỷ</button>
+      <button class="btn btn-ghost flex-1" onclick="previewImport()">👁️ Xem trước</button>
+      <button class="btn btn-primary flex-1" onclick="doImport()">📥 Nhập</button>
+    </div>
+  </div>`);
+  show('modal-import');
+}
+function parseImportText(text) {
+  return text.trim().split('\n').filter(l=>l.trim()).map(line => {
+    const [ho_ten,email,dien_thoai,cong_ty,loai_khach,thanh_pho] = line.split('\t').map(s=>s.trim());
+    return { ho_ten, email, dien_thoai, cong_ty, loai_khach:loai_khach||'sme', thanh_pho:thanh_pho||'HCM' };
+  }).filter(r=>r.ho_ten);
+}
+function previewImport() {
+  const rows = parseImportText(document.getElementById('import-paste').value);
+  if (!rows.length) { setHTML('import-preview','<div class="text-red-400 text-sm">Không có dữ liệu hợp lệ</div>'); return; }
+  let html = `<div class="text-sm text-slate-300 mb-2">Sẽ nhập <b>${rows.length}</b> khách hàng:</div><div class="overflow-auto max-h-32"><table class="text-xs w-full"><tr class="text-slate-500"><td class="p-1">Tên</td><td class="p-1">Email</td><td class="p-1">Loại</td><td class="p-1">TP</td></tr>`;
+  rows.slice(0,5).forEach(r => { html += `<tr class="text-slate-400"><td class="p-1">${r.ho_ten}</td><td class="p-1">${r.email||'—'}</td><td class="p-1">${LOAI[r.loai_khach]||r.loai_khach}</td><td class="p-1">${CITY[r.thanh_pho]||r.thanh_pho}</td></tr>`; });
+  if (rows.length > 5) html += `<tr><td colspan="4" class="p-1 text-slate-600">... và ${rows.length-5} khách khác</td></tr>`;
+  html += `</table></div>`;
+  setHTML('import-preview', html);
+}
+async function doImport() {
+  const rows = parseImportText(document.getElementById('import-paste').value);
+  if (!rows.length) { toast('Không có dữ liệu hợp lệ', 'error'); return; }
+  const r = await api('lead:import', { rows });
+  if (r.success) {
+    closeModal('import');
+    toast(`Đã nhập ${r.imported} leads (bỏ qua ${r.skipped} trùng) ✅`);
+    await loadAllData(); showView(S.currentView);
+  } else toast(r.error||'Lỗi', 'error');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// BOOT
+// ══════════════════════════════════════════════════════════════════
+(async () => {
+  const hasInvite = await checkInviteParam();
+  if (hasInvite) return;
+  if (S.token) { await bootApp(); }
+  else { show('pg-login'); }
+})();
+</script>
+</body>
+</html>

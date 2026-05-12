@@ -5,6 +5,7 @@ interface Env {
   RESEND_API_KEY: string;
   ABS_MA_BAI: string;
   KE_TOAN_EMAIL: string;
+  TELEGRAM_WEBHOOK_SECRET: string;
 }
 
 async function logABS(maBai: string, buoc: string, payload?: object) {
@@ -59,6 +60,12 @@ async function sendEmail(resendKey: string, to: string, subject: string, html: s
 export const onRequest: PagesFunction<Env> = async (context) => {
   if (context.request.method !== 'POST') {
     return new Response('OK', { status: 200 });
+  }
+
+  // Verify Telegram webhook secret — reject anyone who doesn't know the secret
+  const incomingSecret = context.request.headers.get('X-Telegram-Bot-Api-Secret-Token') || '';
+  if (incomingSecret !== context.env.TELEGRAM_WEBHOOK_SECRET) {
+    return new Response('Unauthorized', { status: 401 });
   }
 
   try {

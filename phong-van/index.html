@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phỏng vấn — SEONGON</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f4ff;height:100dvh;display:flex;flex-direction:column}
+  .topbar{background:#004aef;padding:14px 20px;color:#fff;flex-shrink:0}
+  .topbar h1{font-size:16px;font-weight:700}
+  .topbar p{font-size:12px;opacity:.75;margin-top:2px}
+  .messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px}
+  .msg{max-width:80%;padding:12px 16px;border-radius:14px;font-size:15px;line-height:1.6;animation:fadeIn .3s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .msg.ai{background:#fff;border-radius:14px 14px 14px 2px;box-shadow:0 1px 4px rgba(0,0,0,.08);align-self:flex-start}
+  .msg.user{background:#004aef;color:#fff;border-radius:14px 14px 2px 14px;align-self:flex-end}
+  .msg.typing{background:#fff;align-self:flex-start;padding:14px 18px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+  .dots span{display:inline-block;width:7px;height:7px;border-radius:50%;background:#004aef;animation:bounce 1.2s infinite;margin:0 2px}
+  .dots span:nth-child(2){animation-delay:.2s}
+  .dots span:nth-child(3){animation-delay:.4s}
+  @keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
+  .input-bar{background:#fff;border-top:1px solid #eee;padding:14px 16px;display:flex;gap:10px;flex-shrink:0}
+  .input-bar textarea{flex:1;border:1.5px solid #dde3f5;border-radius:10px;padding:10px 14px;font-size:15px;font-family:inherit;resize:none;outline:none;max-height:120px;line-height:1.5}
+  .input-bar textarea:focus{border-color:#004aef}
+  .input-bar button{background:#004aef;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:20px;cursor:pointer;flex-shrink:0;align-self:flex-end}
+  .input-bar button:hover{background:#0036c0}
+  .input-bar button:disabled{background:#ccc;cursor:not-allowed}
+  /* Done screen */
+  .done-screen{display:none;flex:1;align-items:center;justify-content:center;flex-direction:column;padding:40px;text-align:center}
+  .done-screen .icon{font-size:64px;margin-bottom:20px}
+  .done-screen h2{font-size:22px;color:#004aef;font-weight:700;margin-bottom:12px}
+  .done-screen p{color:#555;line-height:1.7;font-size:15px}
+  /* Error screen */
+  .error-screen{display:none;flex:1;align-items:center;justify-content:center;flex-direction:column;padding:40px;text-align:center}
+  .error-screen .icon{font-size:52px;margin-bottom:16px}
+  .error-screen p{color:#888;font-size:15px}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>🎯 Phỏng vấn kế hoạch SEONGON</h1>
+  <p id="topbar-sub">Đang tải...</p>
+</div>
+
+<div class="messages" id="messages"></div>
+
+<div class="error-screen" id="error-screen">
+  <div class="icon">😕</div>
+  <p>Link không hợp lệ hoặc đã hết hạn.<br>Vui lòng liên hệ Thảo để được gửi link mới.</p>
+</div>
+
+<div class="done-screen" id="done-screen">
+  <div class="icon">🎉</div>
+  <h2>Cảm ơn bạn!</h2>
+  <p>Ý kiến của bạn đã được ghi nhận.<br>Thảo sẽ đọc và tổng hợp phản hồi từ toàn team.<br><br>Bạn có thể đóng tab này.</p>
+</div>
+
+<div class="input-bar" id="input-bar">
+  <textarea id="user-input" placeholder="Nhập câu trả lời của bạn..." rows="1"
+    onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"
+    oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
+  <button id="send-btn" onclick="sendMsg()">➤</button>
+</div>
+
+<script>
+const TOKEN = new URLSearchParams(location.search).get('t') || '';
+let interviewId = null;
+let interviewDone = false;
+
+const messagesEl = document.getElementById('messages');
+const inputBar = document.getElementById('input-bar');
+const sendBtn = document.getElementById('send-btn');
+const userInput = document.getElementById('user-input');
+
+function addMsg(role, text) {
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  div.textContent = text;
+  messagesEl.appendChild(div);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+  return div;
+}
+
+function showTyping() {
+  const div = document.createElement('div');
+  div.className = 'msg typing';
+  div.id = 'typing-indicator';
+  div.innerHTML = '<div class="dots"><span></span><span></span><span></span></div>';
+  messagesEl.appendChild(div);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function removeTyping() {
+  const t = document.getElementById('typing-indicator');
+  if (t) t.remove();
+}
+
+function showDone() {
+  interviewDone = true;
+  inputBar.style.display = 'none';
+  messagesEl.style.display = 'none';
+  document.getElementById('done-screen').style.display = 'flex';
+}
+
+async function init() {
+  if (!TOKEN) { showError(); return; }
+  try {
+    const res = await fetch(`/api/chat?t=${TOKEN}&action=init`);
+    const r = await res.json();
+    if (!r.success) { showError(); return; }
+
+    interviewId = r.interview_id;
+    document.getElementById('topbar-sub').textContent = `Xin chào, ${r.nv_name} — ${r.campaign_title}`;
+
+    if (r.status === 'done') { showDone(); return; }
+
+    // Load existing messages or start fresh
+    if (r.messages && r.messages.length > 0) {
+      r.messages.forEach(m => addMsg(m.role === 'assistant' ? 'ai' : 'user', m.content));
+    } else {
+      // First message: AI starts the interview
+      await getAIResponse('__START__');
+    }
+  } catch(e) {
+    showError();
+  }
+}
+
+function showError() {
+  document.getElementById('error-screen').style.display = 'flex';
+  inputBar.style.display = 'none';
+  messagesEl.style.display = 'none';
+  document.getElementById('topbar-sub').textContent = 'Link không hợp lệ';
+}
+
+async function sendMsg() {
+  if (interviewDone) return;
+  const text = userInput.value.trim();
+  if (!text) return;
+
+  userInput.value = '';
+  userInput.style.height = 'auto';
+  sendBtn.disabled = true;
+
+  addMsg('user', text);
+  await getAIResponse(text);
+
+  sendBtn.disabled = false;
+  userInput.focus();
+}
+
+async function getAIResponse(userText) {
+  showTyping();
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({token: TOKEN, message: userText})
+    });
+    const r = await res.json();
+    removeTyping();
+
+    if (r.success) {
+      addMsg('ai', r.reply);
+      if (r.done) {
+        setTimeout(showDone, 1500);
+      }
+    } else {
+      addMsg('ai', 'Xin lỗi, có lỗi kết nối. Bạn thử gửi lại nhé.');
+      sendBtn.disabled = false;
+    }
+  } catch(e) {
+    removeTyping();
+    addMsg('ai', 'Xin lỗi, mất kết nối. Bạn thử gửi lại nhé.');
+    sendBtn.disabled = false;
+  }
+}
+
+init();
+</script>
+</body>
+</html>

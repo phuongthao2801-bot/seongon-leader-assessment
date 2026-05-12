@@ -1,0 +1,14 @@
+# Cloudflare Wrangler cache
+.wrangler/
+
+# Environment / secrets
+*.env
+.env*
+abs19-crm.env
+abs5-secrets.env
+
+# macOS
+.DS_Store
+
+# Node
+node_modules/
