@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quản lý lịch hẹn — SEONGON</title>
+<style>
+  :root {
+    --blue: #004AEF;
+    --blue2: #0033CC;
+    --dark: #000D40;
+    --cyan: #0DD1FF;
+    --gold: #FFCE00;
+    --gray: #64748B;
+    --lgray: #F1F5F9;
+    --border: #E2E8F0;
+    --green: #10B981;
+    --red: #EF4444;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', -apple-system, sans-serif; background: #F8FAFF; color: var(--dark); }
+
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+  /* ── Header ── */
+  .header {
+    background: var(--blue);
+    padding: 0 24px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,74,239,.3);
+  }
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .logo { font-size: 18px; font-weight: 700; color: #fff; letter-spacing: -.3px; }
+  .header-title { font-size: 13px; color: #93C5FD; }
+  .header-right { font-size: 12px; color: #93C5FD; }
+
+  /* ── Login ── */
+  #login-view {
+    min-height: calc(100vh - 56px);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .login-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px;
+    width: 360px;
+    box-shadow: 0 4px 24px rgba(0,74,239,.08);
+    text-align: center;
+  }
+  .login-card h2 { font-size: 20px; margin-bottom: 8px; }
+  .login-card p { font-size: 13px; color: var(--gray); margin-bottom: 24px; }
+  .login-card input {
+    width: 100%; padding: 12px 16px;
+    border: 1.5px solid var(--border); border-radius: 10px;
+    font-size: 15px; margin-bottom: 12px;
+    outline: none; transition: border .2s;
+    font-family: inherit;
+  }
+  .login-card input:focus { border-color: var(--blue); }
+  .btn-primary {
+    width: 100%; padding: 12px;
+    background: var(--blue); color: #fff;
+    border: none; border-radius: 10px;
+    font-size: 15px; font-weight: 600;
+    cursor: pointer; transition: background .2s;
+    font-family: inherit;
+  }
+  .btn-primary:hover { background: var(--blue2); }
+  .err-msg { color: var(--red); font-size: 13px; margin-top: 8px; }
+
+  /* ── Dashboard ── */
+  #dash-view { display: none; }
+  .toolbar {
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+  }
+  .toolbar-left { display: flex; align-items: center; gap: 12px; }
+  .stat-chip {
+    background: var(--lgray);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 13px; font-weight: 600;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .stat-chip span { color: var(--blue); font-size: 16px; }
+  .search-box {
+    padding: 8px 14px;
+    border: 1.5px solid var(--border); border-radius: 8px;
+    font-size: 13px; outline: none; width: 240px;
+    font-family: inherit;
+  }
+  .search-box:focus { border-color: var(--blue); }
+  .btn-refresh {
+    padding: 8px 16px;
+    background: var(--lgray); border: 1px solid var(--border);
+    border-radius: 8px; font-size: 13px; font-weight: 500;
+    cursor: pointer; font-family: inherit;
+    transition: background .2s;
+  }
+  .btn-refresh:hover { background: var(--border); }
+
+  /* ── Table ── */
+  .table-wrap {
+    padding: 20px 24px;
+    overflow-x: auto;
+  }
+  table {
+    width: 100%; border-collapse: collapse;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    font-size: 13px;
+  }
+  thead { background: var(--dark); color: #fff; }
+  thead th {
+    padding: 12px 14px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: .3px;
+    white-space: nowrap;
+  }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--lgray); }
+  td { padding: 12px 14px; vertical-align: middle; }
+  .td-id { font-weight: 700; color: var(--blue); width: 48px; }
+  .td-name { font-weight: 600; min-width: 130px; }
+  .td-email { color: var(--gray); font-size: 12px; min-width: 180px; }
+  .td-company { color: var(--gray); font-size: 12px; }
+  .td-topic { max-width: 200px; color: var(--dark); }
+  .topic-text {
+    display: -webkit-box; -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .td-meeting { min-width: 160px; }
+  .meeting-date { font-weight: 600; font-size: 13px; }
+  .meeting-time {
+    display: inline-block; margin-top: 2px;
+    background: #EEF4FF; color: var(--blue);
+    font-weight: 700; font-size: 11px;
+    padding: 2px 8px; border-radius: 12px;
+  }
+  .td-submit { min-width: 130px; color: var(--gray); font-size: 12px; }
+  .badge {
+    display: inline-block;
+    padding: 3px 10px; border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+  }
+  .badge-confirmed { background: #D1FAE5; color: #065F46; }
+  .badge-cancelled { background: #FEE2E2; color: #991B1B; }
+  .badge-pending   { background: #FEF9C3; color: #92400E; }
+
+  /* ── Empty / Loading ── */
+  .empty-state {
+    text-align: center; padding: 60px 20px;
+    color: var(--gray);
+  }
+  .empty-state svg { margin-bottom: 12px; opacity: .4; }
+  .loading { text-align: center; padding: 40px; color: var(--gray); }
+
+  /* ── Summary cards ── */
+  .cards {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px; padding: 20px 24px 0;
+  }
+  .card {
+    background: #fff; border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px 20px;
+  }
+  .card-label { font-size: 11px; font-weight: 600; color: var(--gray); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+  .card-value { font-size: 28px; font-weight: 700; color: var(--dark); }
+  .card-value.blue { color: var(--blue); }
+  .card-value.green { color: var(--green); }
+
+  /* ── Pagination ── */
+  .pagination {
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px; padding: 16px 24px;
+  }
+  .pg-btn {
+    padding: 6px 14px; border: 1px solid var(--border);
+    border-radius: 8px; background: #fff;
+    font-size: 13px; cursor: pointer; font-family: inherit;
+  }
+  .pg-btn:hover:not(:disabled) { border-color: var(--blue); color: var(--blue); }
+  .pg-btn:disabled { opacity: .4; cursor: not-allowed; }
+  .pg-info { font-size: 13px; color: var(--gray); }
+
+  @media (max-width: 640px) {
+    .toolbar { flex-direction: column; align-items: flex-start; }
+    .search-box { width: 100%; }
+    .cards { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="logo">SEONGON</div>
+    <div class="header-title">Quản lý lịch hẹn</div>
+  </div>
+  <div class="header-right" id="last-updated"></div>
+</div>
+
+<!-- Login -->
+<div id="login-view">
+  <div class="login-card">
+    <div style="font-size:36px;margin-bottom:12px">📅</div>
+    <h2>Quản lý lịch hẹn</h2>
+    <p>Nhập mật khẩu admin để xem danh sách đặt lịch</p>
+    <input type="password" id="pass-input" placeholder="Mật khẩu admin..." />
+    <button class="btn-primary" onclick="doLogin()">Đăng nhập</button>
+    <div class="err-msg" id="login-err"></div>
+  </div>
+</div>
+
+<!-- Dashboard -->
+<div id="dash-view">
+  <!-- Summary cards -->
+  <div class="cards">
+    <div class="card">
+      <div class="card-label">Tổng lịch hẹn</div>
+      <div class="card-value blue" id="stat-total">—</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Tháng này</div>
+      <div class="card-value green" id="stat-month">—</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Tuần này</div>
+      <div class="card-value" id="stat-week">—</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Hôm nay</div>
+      <div class="card-value" id="stat-today">—</div>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <div class="stat-chip">Hiển thị: <span id="showing-count">0</span> lịch</div>
+      <input class="search-box" type="text" id="search-input"
+        placeholder="🔍  Tìm theo tên, email, nội dung..." oninput="filterTable()" />
+    </div>
+    <button class="btn-refresh" onclick="loadBookings()">↻ Làm mới</button>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrap">
+    <div class="loading" id="loading-msg">Đang tải dữ liệu...</div>
+    <table id="bookings-table" style="display:none">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Họ tên</th>
+          <th>Email</th>
+          <th>Công ty</th>
+          <th>Nội dung trao đổi</th>
+          <th>Lịch meeting (giờ VN)</th>
+          <th>Gửi lúc</th>
+          <th>Trạng thái</th>
+        </tr>
+      </thead>
+      <tbody id="bookings-body"></tbody>
+    </table>
+    <div class="empty-state" id="empty-msg" style="display:none">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+        <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+      <p>Chưa có lịch hẹn nào</p>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination" id="pagination" style="display:none">
+    <button class="pg-btn" id="pg-prev" onclick="changePage(-1)" disabled>← Trước</button>
+    <span class="pg-info" id="pg-info"></span>
+    <button class="pg-btn" id="pg-next" onclick="changePage(1)">Sau →</button>
+  </div>
+</div>
+
+<script>
+const API = '/api/booking';
+let adminPass = '';
+let allBookings = [];
+let currentPage = 1;
+let totalCount = 0;
+
+// ── Login ────────────────────────────────────────────────────
+document.getElementById('pass-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+
+async function doLogin() {
+  const p = document.getElementById('pass-input').value.trim();
+  if (!p) return;
+  document.getElementById('login-err').textContent = '';
+  try {
+    const r = await fetch(API, { headers: { 'X-Admin-Pass': p } });
+    if (r.status === 401) {
+      document.getElementById('login-err').textContent = '❌ Sai mật khẩu';
+      return;
+    }
+    adminPass = p;
+    document.getElementById('login-view').style.display = 'none';
+    document.getElementById('dash-view').style.display = 'block';
+    loadBookings();
+  } catch {
+    document.getElementById('login-err').textContent = 'Lỗi kết nối, thử lại';
+  }
+}
+
+// ── Load bookings ────────────────────────────────────────────
+async function loadBookings(page = 1) {
+  currentPage = page;
+  document.getElementById('loading-msg').style.display = 'block';
+  document.getElementById('bookings-table').style.display = 'none';
+  document.getElementById('empty-msg').style.display = 'none';
+
+  const r = await fetch(`${API}?page=${page}`, { headers: { 'X-Admin-Pass': adminPass } });
+  const data = await r.json();
+
+  allBookings = data.bookings || [];
+  totalCount  = data.total || 0;
+
+  updateStats(allBookings, totalCount);
+  renderTable(allBookings);
+  renderPagination(data.page, totalCount);
+
+  const now = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+  document.getElementById('last-updated').textContent = `Cập nhật lúc ${now}`;
+}
+
+// ── Stats ────────────────────────────────────────────────────
+function updateStats(bookings, total) {
+  document.getElementById('stat-total').textContent = total;
+
+  const now = new Date();
+  const vnNow = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' }));
+  const startOfMonth = new Date(vnNow.getFullYear(), vnNow.getMonth(), 1);
+  const startOfWeek  = new Date(vnNow); startOfWeek.setDate(vnNow.getDate() - vnNow.getDay() + 1);
+  const startOfToday = new Date(vnNow.getFullYear(), vnNow.getMonth(), vnNow.getDate());
+
+  let month = 0, week = 0, today = 0;
+  bookings.forEach(b => {
+    const d = new Date(b.created_at?.replace(' ', 'T') + '+07:00');
+    if (d >= startOfMonth) month++;
+    if (d >= startOfWeek)  week++;
+    if (d >= startOfToday) today++;
+  });
+
+  document.getElementById('stat-month').textContent = month;
+  document.getElementById('stat-week').textContent  = week;
+  document.getElementById('stat-today').textContent = today;
+}
+
+// ── Render table ─────────────────────────────────────────────
+function fmtVN(isoStr) {
+  if (!isoStr) return '—';
+  const d = new Date(isoStr);
+  const vn = new Date(d.toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' }));
+  const days = ['CN','T2','T3','T4','T5','T6','T7'];
+  return {
+    date: `${days[vn.getDay()]} ${vn.getDate()}/${vn.getMonth()+1}/${vn.getFullYear()}`,
+    time: `${String(vn.getHours()).padStart(2,'0')}:${String(vn.getMinutes()).padStart(2,'0')}`,
+  };
+}
+
+function fmtSubmit(str) {
+  if (!str) return '—';
+  // created_at is stored as "2026-05-12 09:55:19" (UTC or VN?)
+  const d = new Date(str.replace(' ', 'T') + '+07:00');
+  const vn = new Date(d.toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' }));
+  return `${vn.getDate()}/${vn.getMonth()+1}/${vn.getFullYear()}<br>
+    <span style="color:#94a3b8">${String(vn.getHours()).padStart(2,'0')}:${String(vn.getMinutes()).padStart(2,'0')}</span>`;
+}
+
+function statusBadge(s) {
+  const map = { confirmed: ['badge-confirmed','✓ Đã xác nhận'],
+                cancelled: ['badge-cancelled','✗ Đã hủy'],
+                pending:   ['badge-pending','⏳ Chờ xác nhận'] };
+  const [cls, label] = map[s] || ['badge-pending', s || 'Không rõ'];
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+
+function renderTable(list) {
+  document.getElementById('loading-msg').style.display = 'none';
+  const tbody = document.getElementById('bookings-body');
+
+  if (!list.length) {
+    document.getElementById('empty-msg').style.display = 'block';
+    document.getElementById('showing-count').textContent = 0;
+    return;
+  }
+
+  document.getElementById('bookings-table').style.display = 'table';
+  document.getElementById('showing-count').textContent = list.length;
+
+  tbody.innerHTML = list.map(b => {
+    const meeting = fmtVN(b.slot_start);
+    return `
+      <tr>
+        <td class="td-id">#${b.id}</td>
+        <td class="td-name">${esc(b.name)}</td>
+        <td class="td-email">${esc(b.email)}</td>
+        <td class="td-company">${esc(b.company || '—')}</td>
+        <td class="td-topic"><div class="topic-text">${esc(b.topic)}</div></td>
+        <td class="td-meeting">
+          <div class="meeting-date">${meeting.date}</div>
+          <div class="meeting-time">${meeting.time}</div>
+        </td>
+        <td class="td-submit">${fmtSubmit(b.created_at)}</td>
+        <td>${statusBadge(b.status)}</td>
+      </tr>`;
+  }).join('');
+}
+
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── Search / filter ──────────────────────────────────────────
+function filterTable() {
+  const q = document.getElementById('search-input').value.toLowerCase();
+  const filtered = allBookings.filter(b =>
+    (b.name||'').toLowerCase().includes(q) ||
+    (b.email||'').toLowerCase().includes(q) ||
+    (b.company||'').toLowerCase().includes(q) ||
+    (b.topic||'').toLowerCase().includes(q)
+  );
+  renderTable(filtered);
+}
+
+// ── Pagination ───────────────────────────────────────────────
+function renderPagination(page, total) {
+  const totalPages = Math.ceil(total / 50);
+  if (totalPages <= 1) { document.getElementById('pagination').style.display = 'none'; return; }
+  document.getElementById('pagination').style.display = 'flex';
+  document.getElementById('pg-info').textContent = `Trang ${page} / ${totalPages}`;
+  document.getElementById('pg-prev').disabled = page <= 1;
+  document.getElementById('pg-next').disabled = page >= totalPages;
+}
+
+function changePage(dir) {
+  loadBookings(currentPage + dir);
+}
+</script>
+</body>
+</html>

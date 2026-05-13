@@ -4,7 +4,39 @@ interface Env {
   TELEGRAM_BOT_TOKEN: string;
   TELEGRAM_CHAT_ID: string;
   RATE_LIMIT_KV: KVNamespace;
+  DU_AN_PASS: string;
 }
+
+// GET /api/booking — admin list (requires X-Admin-Pass header)
+export const onRequestGet: PagesFunction<Env> = async (context) => {
+  const { request, env } = context;
+  const cors = { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' };
+
+  const pass = request.headers.get('X-Admin-Pass') || '';
+  if (pass !== env.DU_AN_PASS) {
+    return new Response(JSON.stringify({ error: 'Sai mật khẩu' }), { status: 401, headers: cors });
+  }
+
+  const url = new URL(request.url);
+  const page = parseInt(url.searchParams.get('page') || '1', 10);
+  const limit = 50;
+  const offset = (page - 1) * limit;
+
+  const [rows, total] = await Promise.all([
+    env.BOOKING_DB.prepare(
+      `SELECT id, name, email, company, topic, slot_start, slot_end, status, created_at
+       FROM bookings ORDER BY id DESC LIMIT ? OFFSET ?`
+    ).bind(limit, offset).all(),
+    env.BOOKING_DB.prepare(`SELECT COUNT(*) as cnt FROM bookings`).first<{ cnt: number }>(),
+  ]);
+
+  return new Response(JSON.stringify({
+    success: true,
+    total: total?.cnt ?? 0,
+    page,
+    bookings: rows.results,
+  }), { status: 200, headers: cors });
+};
 
 async function checkRateLimit(kv: KVNamespace, ip: string, endpoint: string, max = 10, windowSec = 600): Promise<boolean> {
   const key = `rl:${endpoint}:${ip}`;
