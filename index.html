@@ -203,7 +203,10 @@
     margin-bottom: 28px; color: #111;
   }
   .section-title em { font-style: normal; color: var(--brand); }
-  .about-text { font-size: 16px; line-height: 1.85; color: #444; }
+  .about-text { font-size: 16px; line-height: 1.85; color: #444; margin-bottom: 16px; }
+  .about-list { font-size: 16px; line-height: 1.85; color: #444; padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .about-list li { padding-left: 20px; position: relative; }
+  .about-list li::before { content: "→"; position: absolute; left: 0; color: var(--blue); font-weight: 700; }
 
   /* ── EXPERTISE ── */
   .expertise-section { padding: 80px 40px; background: #fff; }
@@ -356,7 +359,15 @@
   <div class="about-inner">
     <span class="section-label">Về tôi</span>
     <h2 class="section-title">Hành trình <em>14 năm</em> đồng hành<br>cùng doanh nghiệp Việt</h2>
-    <p class="about-text">14 năm trong ngành Digital Marketing đã cho tôi cơ hội được đồng hành cùng hơn 20 doanh nghiệp lớn nhỏ như Sun World, Richy, Sim Thăng Long... trong hành trình xây dựng thương hiệu số bền vững. Trước khi gắn bó với SEONGON, tôi đã tích lũy kinh nghiệm thực chiến tại BioSpring và Mazda Việt Nam, nơi tôi hiểu rằng Marketing hiệu quả phải đo được bằng kết quả kinh doanh thực tế. Tôi cũng là giảng viên Google Marketing tại SEONGON và Học viện IM Group, vì tôi tin rằng chia sẻ kiến thức là cách nhanh nhất để nâng tầm cả ngành. Là diễn giả tại Diễn đàn CSMO - VSMCamp và giám khảo Marketing Hive, Marketing On Air NEU nhiều năm liên tiếp, tôi luôn tìm cách kết nối thế hệ làm marketing kế tiếp với những bài học thực tiễn nhất. Với tôi, mỗi chiến dịch không chỉ là con số, đó là câu chuyện tăng trưởng của một doanh nghiệp, một con người.</p>
+    <p class="about-text">Với hơn 14 năm kinh nghiệm với Digital Marketing, tôi đã đồng hành cùng hàng trăm doanh nghiệp vừa và lớn tăng trưởng bền vững qua các giải pháp SEO và Digital Marketing toàn diện.</p>
+    <ul class="about-list">
+      <li>Kinh nghiệm tư vấn và triển khai Digital Branding cho hơn 20 doanh nghiệp lớn nhỏ: Sun World, Richy, Tổng cục du lịch Hàn Quốc, Sim Thăng Long...</li>
+      <li>Quản lý &amp; Chuyên viên Marketing tại doanh nghiệp: SEONGON, BioSpring, Mazda Việt Nam</li>
+      <li>Giảng viên Google Marketing tại SEONGON, Học viện IM Group</li>
+      <li>Diễn giả sự kiện Marketing: Diễn đàn CSMO VSMCamp - Giám đốc Sales &amp; Marketing Việt Nam</li>
+      <li>Giám khảo các cuộc thi Marketing Hive - Trại hè Marketing Học viện Ngoại giao 2022 - 2023 - 2024, Marketing On Air - NEU</li>
+      <li>Thỉnh giảng tại Khoa Marketing - Đại học Thương Mại</li>
+    </ul>
 
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px;">
       <div style="overflow:hidden;border-radius:16px;aspect-ratio:4/3;box-shadow:0 4px 20px rgba(0,0,0,.10);">
