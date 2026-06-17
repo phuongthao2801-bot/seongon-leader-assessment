@@ -228,23 +228,28 @@
   /* ── SPEAKER SECTION ── */
   .speaker-section { padding: 80px 40px; background: #f7f9ff; }
   .speaker-inner { max-width: 960px; margin: 0 auto; }
-  .speaker-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; margin-top: 40px; }
+  .speaker-grid {
+    display: flex; gap: 16px; margin-top: 40px;
+    overflow-x: auto; padding-bottom: 16px; scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: #004aef #e8f0ff;
+  }
+  .speaker-grid::-webkit-scrollbar { height: 6px; }
+  .speaker-grid::-webkit-scrollbar-track { background: #e8f0ff; border-radius: 3px; }
+  .speaker-grid::-webkit-scrollbar-thumb { background: #004aef; border-radius: 3px; }
   .speaker-card {
-    background: #fff; border-radius: 16px; overflow: hidden;
+    flex: 0 0 240px; background: #fff; border-radius: 16px; overflow: hidden;
     box-shadow: 0 4px 20px rgba(0,74,239,0.08);
-    transition: transform 0.3s, box-shadow 0.3s;
+    transition: transform 0.3s, box-shadow 0.3s; scroll-snap-align: start;
   }
   .speaker-card:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(0,74,239,0.15); }
   .speaker-img-wrap {
     width: 100%; aspect-ratio: 4/3; overflow: hidden;
     background: linear-gradient(135deg, #004aef, #0035c0);
   }
-  .speaker-img-wrap img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
-  .speaker-info { padding: 16px; }
-  .speaker-event { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--blue); margin-bottom: 4px; }
+  .speaker-img-wrap img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
+  .speaker-info { padding: 14px; }
+  .speaker-event { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--blue); margin-bottom: 4px; }
   .speaker-title { font-size: 13px; font-weight: 600; color: #111; line-height: 1.4; }
-  @media (max-width: 768px) { .speaker-grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 480px) { .speaker-grid { grid-template-columns: 1fr 1fr; gap: 12px; } }
 
   /* ── CTA SECTION ── */
   .cta-section {
